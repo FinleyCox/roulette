@@ -13,6 +13,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final List<TextEditingController> titleControllers = [];
   final List<TextEditingController> multiChoiceControllers = [];
   int cardCount = 4; // カードの数を管理
+  bool isSaved = false; // 保存状態を管理
 
   @override
   void initState() {
@@ -106,11 +107,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await prefs.setString('card_multichoice_$i', multiChoice);
     }
 
-    if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('設定を保存しました')));
-    }
+    // 保存状態を更新
+    setState(() {
+      isSaved = true;
+    });
+
+    // 1秒後にボタンを元に戻す
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          isSaved = false;
+        });
+      }
+    });
   }
 
   // デフォルトの設定に戻す(右上のボタン)
@@ -311,7 +320,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onPressed: _saveSettings,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.blue[600],
+                  backgroundColor: isSaved
+                      ? Colors.orange[400]
+                      : Colors.blue[600],
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -319,7 +330,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   elevation: 2,
                 ),
                 child: Text(
-                  '保存',
+                  isSaved ? 'Saved' : 'Save',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
