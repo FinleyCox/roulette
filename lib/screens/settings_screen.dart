@@ -11,28 +11,29 @@ class SettingsScreen extends StatefulWidget {
 // 設定画面の状態を管理するクラス
 class _SettingsScreenState extends State<SettingsScreen> {
   final List<TextEditingController> titleControllers = [];
-  final List<TextEditingController> messageControllers = [];
   final List<TextEditingController> multiChoiceControllers = [];
+  int cardCount = 4; // カードの数を管理
 
   @override
   void initState() {
     super.initState();
-    // 4つのカード用のコントローラーを初期化
-    for (int i = 0; i < 4; i++) {
+    // 初期コントローラーを追加
+    _ensureControllers(4);
+    _loadSettings();
+  }
+
+  // コントローラーの数を確保するメソッド
+  void _ensureControllers(int count) {
+    while (titleControllers.length < count) {
       titleControllers.add(TextEditingController());
-      messageControllers.add(TextEditingController());
       multiChoiceControllers.add(TextEditingController());
     }
-    _loadSettings();
   }
 
   @override
   // コントローラーを破棄
   void dispose() {
     for (var controller in titleControllers) {
-      controller.dispose();
-    }
-    for (var controller in messageControllers) {
       controller.dispose();
     }
     for (var controller in multiChoiceControllers) {
@@ -46,43 +47,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // 設定を取得
     final prefs = await SharedPreferences.getInstance();
 
-    // 4つのカード用のコントローラーを初期化
-    for (int i = 0; i < 4; i++) {
-      final title = prefs.getString('card_title_$i') ?? _getDefaultTitle(i);
-      final message =
-          prefs.getString('card_message_$i') ?? _getDefaultMessage(i);
+    // 保存されたカード数を読み込み
+    final savedCardCount = prefs.getInt('card_count') ?? 4;
+
+    // カード数が変更された場合のみ更新
+    if (savedCardCount != cardCount) {
+      setState(() {
+        cardCount = savedCardCount;
+        // コントローラーの数を調整
+        _ensureControllers(cardCount);
+      });
+    } else {
+      // コントローラーの数を調整
+      _ensureControllers(cardCount);
+    }
+
+    // カード用のコントローラーを初期化
+    for (int i = 0; i < cardCount; i++) {
+      final title = prefs.getString('card_title_$i') ?? '';
       final multiChoice = prefs.getString('card_multichoice_$i') ?? '';
 
       titleControllers[i].text = title;
-      messageControllers[i].text = message;
       multiChoiceControllers[i].text = multiChoice;
     }
-  }
-
-  // デフォルトのタイトルを返す
-  String _getDefaultTitle(int index) {
-    final titles = ['🎯 ターゲット1', '⚡ ターゲット2', '🔥 ターゲット3', '🏆 最終ターゲット'];
-    return titles[index];
-  }
-
-  // デフォルトの内容を返す
-  String _getDefaultMessage(int index) {
-    final messages = [
-      '🎉 1つ目クリア！',
-      '🌟 2つ目クリア！',
-      '💎 3つ目クリア！',
-      '🎊 全ターゲットクリア！',
-    ];
-    return messages[index];
   }
 
   // 設定を保存
   Future<void> _saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
 
-    for (int i = 0; i < 4; i++) {
+    // カード数を保存
+    await prefs.setInt('card_count', cardCount);
+
+    for (int i = 0; i < cardCount; i++) {
       await prefs.setString('card_title_$i', titleControllers[i].text);
-      await prefs.setString('card_message_$i', messageControllers[i].text);
       await prefs.setString(
         'card_multichoice_$i',
         multiChoiceControllers[i].text,
@@ -98,12 +96,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // デフォルトの設定に戻す(右上のボタン)
   void _resetToDefaults() {
-    for (int i = 0; i < 4; i++) {
-      titleControllers[i].text = _getDefaultTitle(i);
-      messageControllers[i].text = _getDefaultMessage(i);
+    for (int i = 0; i < cardCount; i++) {
+      titleControllers[i].text = '';
       multiChoiceControllers[i].text = '';
     }
     _saveSettings();
+  }
+
+  // カードを追加するメソッド
+  void _addCard() async {
+    setState(() {
+      cardCount++;
+      _ensureControllers(cardCount);
+      // 新しいカードのデフォルト値を設定
+      titleControllers[cardCount - 1].text = '';
+      multiChoiceControllers[cardCount - 1].text = '';
+    });
+    // 追加後に即座に保存
+    await _saveSettings();
+  }
+
+  // カードを削除するメソッド
+  void _removeCard(int index) async {
+    if (cardCount > 1) {
+      setState(() {
+        cardCount--;
+        // 削除されたカード以降のデータをシフト
+        for (int i = index; i < cardCount; i++) {
+          titleControllers[i].text = titleControllers[i + 1].text;
+          multiChoiceControllers[i].text = multiChoiceControllers[i + 1].text;
+        }
+      });
+      // 削除後に即座に保存
+      await _saveSettings();
+    }
   }
 
   @override
@@ -118,6 +144,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             icon: const Icon(Icons.restore),
             tooltip: 'デフォルトに戻す',
           ),
+          IconButton(
+            onPressed: _addCard,
+            icon: const Icon(Icons.add),
+            tooltip: 'カードを追加',
+          ),
         ],
       ),
       // 設定画面の本体(タイトルと内容を入力)
@@ -127,7 +158,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: 4,
+                itemCount: cardCount,
                 itemBuilder: (context, index) {
                   return Card(
                     margin: const EdgeInsets.only(bottom: 16),
@@ -136,42 +167,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'カード ${index + 1}',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'カード ${index + 1}',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              if (cardCount > 1)
+                                IconButton(
+                                  onPressed: () => _removeCard(index),
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  tooltip: 'カードを削除',
+                                ),
+                            ],
                           ),
                           const SizedBox(height: 16),
                           TextField(
                             controller: titleControllers[index],
                             decoration: const InputDecoration(
-                              labelText: 'タイトル',
                               border: OutlineInputBorder(),
+                              hintText: 'タイトル（例: 明日の予定）',
+                              hintStyle: TextStyle(
+                                color: Color.fromARGB(255, 193, 191, 191),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 12),
-                          if (index >= 2) ...[
-                            const SizedBox(height: 12),
-                            TextField(
-                              controller: multiChoiceControllers[index],
-                              decoration: const InputDecoration(
-                                labelText: '複数選択可',
-                                border: OutlineInputBorder(),
-                                hintText: '例: 警察官、花屋、パン屋',
-                                helperText: '複数の選択肢を「、」で区切って入力してください',
+                          TextField(
+                            controller: multiChoiceControllers[index],
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: '例: 犬、猫、鳥',
+                              hintStyle: TextStyle(
+                                color: Color.fromARGB(255, 193, 191, 191),
                               ),
+                              helperText: '複数の選択肢を「、」で区切って入力してください',
                             ),
-                          ] else ...[
-                            TextField(
-                              controller: messageControllers[index],
-                              decoration: const InputDecoration(
-                                labelText: '内容',
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                          ],
+                          ),
                         ],
                       ),
                     ),

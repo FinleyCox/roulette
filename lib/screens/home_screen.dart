@@ -6,8 +6,6 @@ import '../widgets/scratch_card.dart';
 import '../models/scratch_state.dart';
 import 'settings_screen.dart';
 
-/// TODO: 3, 4が個別リセットの時に連動して変更されるので別々にする
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title});
   final String title;
@@ -25,10 +23,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // デフォルト設定
   final List<Map<String, String>> defaultConfigs = [
-    {'title': '🎯 ターゲット1', 'completedMessage': '🎉 1つ目クリア！'},
-    {'title': '⚡ ターゲット2', 'completedMessage': '🌟 2つ目クリア！'},
-    {'title': '🔥 ターゲット3', 'completedMessage': '💎 3つ目クリア！'},
-    {'title': '🏆 最終ターゲット', 'completedMessage': '🎊 全ターゲットクリア！'},
+    for (int i = 0; i < 4; i++)
+      {'title': '🎯 ターゲット${i + 1}', 'completedMessage': '🎉 ${i + 1}つ目クリア！'},
   ];
 
   final RefreshController _refreshController = RefreshController(
@@ -38,10 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // 4つのスクラッチ状態を初期化
+    // 初期値を設定
     scratchStates = List.generate(4, (index) => ScratchState(maxCount: 4));
     cardKeys = List.generate(4, (index) => UniqueKey());
-
     cardConfigs = List.from(defaultConfigs);
     _loadSettings();
   }
@@ -51,11 +46,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     final random = Random();
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < cardConfigs.length; i++) {
       final multiChoice = prefs.getString('card_multichoice_$i') ?? '';
 
       // 複数選択肢がある場合はランダムに選択
-      if (multiChoice.isNotEmpty && i >= 2) {
+      if (multiChoice.isNotEmpty) {
         final choices = multiChoice
             .split('、')
             .where((s) => s.trim().isNotEmpty)
@@ -74,27 +69,25 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // 個別カードのランダム選択を更新するメソッド
+  // 個別カードのランダム選択を更新するメソッド（リセットボタンを押した時）
   Future<void> _updateSingleRandomChoice(int index) async {
     final prefs = await SharedPreferences.getInstance();
     final multiChoice = prefs.getString('card_multichoice_$index') ?? '';
 
     // 複数選択肢がある場合はランダムに選択
-    if (multiChoice.isNotEmpty && index >= 2) {
-      final choices = multiChoice
-          .split('、')
-          .where((s) => s.trim().isNotEmpty)
-          .toList();
-      if (choices.isNotEmpty) {
-        final random = Random();
-        final randomIndex = random.nextInt(choices.length);
-        final randomChoice = choices[randomIndex].trim();
+    final choices = multiChoice
+        .split('、')
+        .where((s) => s.trim().isNotEmpty)
+        .toList();
+    if (choices.isNotEmpty) {
+      final random = Random();
+      final randomIndex = random.nextInt(choices.length);
+      final randomChoice = choices[randomIndex].trim();
 
-        if (mounted) {
-          setState(() {
-            cardConfigs[index]['completedMessage'] = randomChoice;
-          });
-        }
+      if (mounted) {
+        setState(() {
+          cardConfigs[index]['completedMessage'] = randomChoice;
+        });
       }
     }
   }
@@ -102,18 +95,26 @@ class _HomeScreenState extends State<HomeScreen> {
   // 設定を読み込む
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    // ４つ表示
-    for (int i = 0; i < 4; i++) {
+
+    // カード数を読み込み
+    final cardCount = prefs.getInt('card_count') ?? 4;
+
+    // スクラッチ状態とキーを初期化
+    scratchStates = List.generate(
+      cardCount,
+      (index) => ScratchState(maxCount: cardCount),
+    );
+    cardKeys = List.generate(cardCount, (index) => UniqueKey());
+
+    // カード設定を初期化
+    cardConfigs = List.generate(cardCount, (index) {
       final title =
-          prefs.getString('card_title_$i') ?? defaultConfigs[i]['title']!;
-      final message =
-          prefs.getString('card_message_$i') ??
-          defaultConfigs[i]['completedMessage']!;
-      final multiChoice = prefs.getString('card_multichoice_$i') ?? '';
+          prefs.getString('card_title_$index') ?? '🎯 ターゲット${index + 1}';
+      final multiChoice = prefs.getString('card_multichoice_$index') ?? '';
 
       // 複数選択肢がある場合はランダムに選択
-      String finalMessage = message;
-      if (multiChoice.isNotEmpty && i >= 2) {
+      String finalMessage = '🎉 ${index + 1}つ目クリア！';
+      if (multiChoice.isNotEmpty) {
         final choices = multiChoice
             .split('、')
             .where((s) => s.trim().isNotEmpty)
@@ -125,8 +126,9 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
 
-      cardConfigs[i] = {'title': title, 'completedMessage': finalMessage};
-    }
+      return {'title': title, 'completedMessage': finalMessage};
+    });
+
     // 設定を反映
     if (mounted) {
       setState(() {});
@@ -147,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await _updateSingleRandomChoice(index);
   }
 
+  // すべてリセットを押した時
   void _resetAll() async {
     setState(() {
       // すべてのスクラッチ状態をリセット
@@ -154,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
         state.reset();
       }
       // 新しいキーを生成してカードを完全にリセット
-      cardKeys = List.generate(4, (index) => UniqueKey());
+      cardKeys = List.generate(scratchStates.length, (index) => UniqueKey());
     });
     // リセット時にランダム選択を更新
     await _updateRandomChoices();
@@ -215,9 +218,6 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         ),
-        //     ],
-        //   ),
-        // ),
       ),
     );
   }
