@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadSettings();
   }
 
-  // ランダム選択を更新するメソッド
+  // ランダム選択を更新するメソッド（全体）
   Future<void> _updateRandomChoices() async {
     final prefs = await SharedPreferences.getInstance();
     final random = Random();
@@ -69,6 +69,31 @@ class _HomeScreenState extends State<HomeScreen> {
               cardConfigs[i]['completedMessage'] = randomChoice;
             });
           }
+        }
+      }
+    }
+  }
+
+  // 個別カードのランダム選択を更新するメソッド
+  Future<void> _updateSingleRandomChoice(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    final multiChoice = prefs.getString('card_multichoice_$index') ?? '';
+
+    // 複数選択肢がある場合はランダムに選択
+    if (multiChoice.isNotEmpty && index >= 2) {
+      final choices = multiChoice
+          .split('、')
+          .where((s) => s.trim().isNotEmpty)
+          .toList();
+      if (choices.isNotEmpty) {
+        final random = Random();
+        final randomIndex = random.nextInt(choices.length);
+        final randomChoice = choices[randomIndex].trim();
+
+        if (mounted) {
+          setState(() {
+            cardConfigs[index]['completedMessage'] = randomChoice;
+          });
         }
       }
     }
@@ -118,8 +143,8 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       scratchStates[index].reset();
     });
-    // 個別リセット時もランダム選択を更新
-    await _updateRandomChoices();
+    // 個別リセット時はそのカードのみランダム選択を更新
+    await _updateSingleRandomChoice(index);
   }
 
   void _resetAll() async {
