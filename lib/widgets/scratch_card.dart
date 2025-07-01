@@ -49,25 +49,35 @@ class _ScratchCardState extends State<ScratchCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
+      elevation: 10,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Column(
         children: [
           // カード番号表示
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 229, 242, 254),
-            ),
+            decoration: BoxDecoration(color: Colors.white),
             child: Padding(
               padding: const EdgeInsets.only(left: 16),
-              child: Text(
-                widget.cardTitle,
-                textAlign: TextAlign.left,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+              child: Row(
+                children: [
+                  Text(
+                    widget.cardTitle,
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Expanded(child: Container()),
+                  IconButton(
+                    onPressed: _resetScratcher,
+                    icon: const Icon(Icons.undo),
+                    color: Colors.black,
+                    alignment: Alignment.centerRight,
+                  ),
+                ],
               ),
             ),
           ),
@@ -75,45 +85,45 @@ class _ScratchCardState extends State<ScratchCard> {
           // スクラッチエリア
           Expanded(
             child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+              ),
               alignment: Alignment.center,
-              child: Scratcher(
-                key: scratchKey,
-                brushSize: 40,
-                threshold: 50,
-                color: Colors.grey,
-                onThreshold: () {
-                  setState(() {
-                    isCompleted = true;
-                  });
-                  widget.onScratch();
-                },
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Center(
-                    child: Text(
-                      widget.completedMessage,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+                child: Scratcher(
+                  key: scratchKey,
+                  brushSize: 40,
+                  threshold: 50,
+                  color: const Color.fromARGB(255, 200, 198, 198),
+                  onThreshold: () {
+                    setState(() {
+                      isCompleted = true;
+                    });
+                    widget.onScratch();
+                  },
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Center(
+                      child: Text(
+                        widget.completedMessage,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
-
-          // リセットボタン
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(8),
-            child: ElevatedButton(
-              onPressed: _resetScratcher,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-              ),
-              child: const Text('リセット', style: TextStyle(fontSize: 12)),
             ),
           ),
         ],

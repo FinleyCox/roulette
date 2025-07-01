@@ -42,6 +42,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   }
 
+  // デフォルトのタイトルを返す
+  String _getDefaultTitle(int index) {
+    final titles = ['カード1', 'カード2', 'カード3', 'カード4'];
+    if (index < titles.length) {
+      return titles[index];
+    }
+    return 'カード${index + 1}';
+  }
+
   // 設定を読み込む
   Future<void> _loadSettings() async {
     // 設定を取得
@@ -64,10 +73,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     // カード用のコントローラーを初期化
     for (int i = 0; i < cardCount; i++) {
-      final title = prefs.getString('card_title_$i') ?? '';
+      final savedTitle = prefs.getString('card_title_$i');
       final multiChoice = prefs.getString('card_multichoice_$i') ?? '';
 
-      titleControllers[i].text = title;
+      // 保存されたタイトルが空またはデフォルト値と同じ場合は空にする
+      if (savedTitle == null ||
+          savedTitle.isEmpty ||
+          savedTitle == _getDefaultTitle(i)) {
+        titleControllers[i].text = '';
+      } else {
+        titleControllers[i].text = savedTitle;
+      }
       multiChoiceControllers[i].text = multiChoice;
     }
   }
@@ -80,11 +96,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await prefs.setInt('card_count', cardCount);
 
     for (int i = 0; i < cardCount; i++) {
-      await prefs.setString('card_title_$i', titleControllers[i].text);
-      await prefs.setString(
-        'card_multichoice_$i',
-        multiChoiceControllers[i].text,
-      );
+      // 空の場合はデフォルト値を使用
+      final title = titleControllers[i].text.trim().isEmpty
+          ? _getDefaultTitle(i)
+          : titleControllers[i].text;
+      final multiChoice = multiChoiceControllers[i].text.trim();
+
+      await prefs.setString('card_title_$i', title);
+      await prefs.setString('card_multichoice_$i', multiChoice);
     }
 
     if (mounted) {
@@ -97,7 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // デフォルトの設定に戻す(右上のボタン)
   void _resetToDefaults() {
     for (int i = 0; i < cardCount; i++) {
-      titleControllers[i].text = '';
+      titleControllers[i].text = _getDefaultTitle(i);
       multiChoiceControllers[i].text = '';
     }
     _saveSettings();
@@ -109,7 +128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       cardCount++;
       _ensureControllers(cardCount);
       // 新しいカードのデフォルト値を設定
-      titleControllers[cardCount - 1].text = '';
+      titleControllers[cardCount - 1].text = _getDefaultTitle(cardCount - 1);
       multiChoiceControllers[cardCount - 1].text = '';
     });
     // 追加後に即座に保存
@@ -136,22 +155,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('設定'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(
+          '設定',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
         actions: [
           IconButton(
             onPressed: _resetToDefaults,
-            icon: const Icon(Icons.restore),
+            icon: const Icon(Icons.restore, color: Colors.black87, size: 28),
             tooltip: 'デフォルトに戻す',
           ),
           IconButton(
             onPressed: _addCard,
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, color: Colors.black87, size: 28),
             tooltip: 'カードを追加',
           ),
         ],
       ),
       // 設定画面の本体(タイトルと内容を入力)
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -162,6 +190,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 itemBuilder: (context, index) {
                   return Card(
                     margin: const EdgeInsets.only(bottom: 16),
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -173,8 +205,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               Text(
                                 'カード ${index + 1}',
                                 style: const TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
                                 ),
                               ),
                               if (cardCount > 1)
@@ -191,24 +224,78 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           const SizedBox(height: 16),
                           TextField(
                             controller: titleControllers[index],
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              hintText: 'タイトル（例: 明日の予定）',
-                              hintStyle: TextStyle(
-                                color: Color.fromARGB(255, 193, 191, 191),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Colors.grey,
+                                ),
                               ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Colors.blue,
+                                  width: 2,
+                                ),
+                              ),
+                              hintText: _getDefaultTitle(index),
+                              hintStyle: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[50],
                             ),
                           ),
                           const SizedBox(height: 12),
                           TextField(
                             controller: multiChoiceControllers[index],
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Colors.blue,
+                                  width: 2,
+                                ),
+                              ),
                               hintText: '例: 犬、猫、鳥',
-                              hintStyle: TextStyle(
-                                color: Color.fromARGB(255, 193, 191, 191),
+                              hintStyle: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
                               ),
                               helperText: '複数の選択肢を「、」で区切って入力してください',
+                              helperStyle: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[50],
                             ),
                           ),
                         ],
@@ -224,8 +311,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onPressed: _saveSettings,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: Colors.blue[600],
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
                 ),
-                child: const Text('保存'),
+                child: Text(
+                  '保存',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ],

@@ -23,9 +23,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // デフォルト設定
   final List<Map<String, String>> defaultConfigs = [
-    for (int i = 0; i < 4; i++)
-      {'title': '🎯 ターゲット${i + 1}', 'completedMessage': '🎉 ${i + 1}つ目クリア！'},
+    {'title': 'カード1', 'completedMessage': 'カード1の結果'},
+    {'title': 'カード2', 'completedMessage': 'カード2の結果'},
+    {'title': 'カード3', 'completedMessage': 'カード3の結果'},
+    {'title': 'カード4', 'completedMessage': 'カード4の結果'},
   ];
+
+  // デフォルトのタイトルを返す
+  String _getDefaultTitle(int index) {
+    if (index < defaultConfigs.length) {
+      return defaultConfigs[index]['title']!;
+    }
+    return 'カード${index + 1}';
+  }
+
+  // デフォルトのメッセージを返す
+  String _getDefaultMessage(int index) {
+    if (index < defaultConfigs.length) {
+      return defaultConfigs[index]['completedMessage']!;
+    }
+    return '${index + 1}つ目';
+  }
 
   final RefreshController _refreshController = RefreshController(
     initialRefresh: false,
@@ -37,7 +55,14 @@ class _HomeScreenState extends State<HomeScreen> {
     // 初期値を設定
     scratchStates = List.generate(4, (index) => ScratchState(maxCount: 4));
     cardKeys = List.generate(4, (index) => UniqueKey());
-    cardConfigs = List.from(defaultConfigs);
+    // デフォルト設定で初期化
+    cardConfigs = List.generate(
+      4,
+      (index) => {
+        'title': _getDefaultTitle(index),
+        'completedMessage': _getDefaultMessage(index),
+      },
+    );
     _loadSettings();
   }
 
@@ -108,12 +133,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // カード設定を初期化
     cardConfigs = List.generate(cardCount, (index) {
-      final title =
-          prefs.getString('card_title_$index') ?? '🎯 ターゲット${index + 1}';
+      final savedTitle = prefs.getString('card_title_$index');
       final multiChoice = prefs.getString('card_multichoice_$index') ?? '';
 
+      // タイトルが空またはnullの場合はデフォルト値を使用
+      final title = (savedTitle == null || savedTitle.isEmpty)
+          ? _getDefaultTitle(index)
+          : savedTitle;
+
       // 複数選択肢がある場合はランダムに選択
-      String finalMessage = '🎉 ${index + 1}つ目クリア！';
+      String finalMessage = _getDefaultMessage(index);
       if (multiChoice.isNotEmpty) {
         final choices = multiChoice
             .split('、')
@@ -168,8 +197,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       // 上部
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          widget.title,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
         actions: [
           IconButton(
             onPressed: () async {
@@ -179,13 +216,14 @@ class _HomeScreenState extends State<HomeScreen> {
               );
               _loadSettings();
             },
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.settings, color: Colors.black87, size: 28),
             tooltip: '設定',
           ),
         ],
       ),
 
       // メインの部分
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(18.0),
         child: SmartRefresher(
