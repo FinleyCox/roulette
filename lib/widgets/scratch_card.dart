@@ -100,9 +100,9 @@ class _ScratchCardState extends State<ScratchCard> {
                 ),
                 child: Scratcher(
                   key: scratchKey,
-                  brushSize: 40,
+                  brushSize: 30,
                   threshold: 50,
-                  color: const Color.fromARGB(255, 200, 198, 198),
+                  color: const Color.fromARGB(255, 219, 216, 216),
                   onThreshold: () {
                     setState(() {
                       isCompleted = true;
