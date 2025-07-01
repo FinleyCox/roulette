@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations: 
+    sdk: flutter  
   scratcher: "^2.5.0"
   shared_preferences: ^2.2.2
   pull_to_refresh: ^2.0.0
