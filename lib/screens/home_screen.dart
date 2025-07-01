@@ -234,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
             await Future.delayed(const Duration(milliseconds: 500));
             _refreshController.refreshCompleted();
           },
-          header: const WaterDropHeader(),
+          header: const ClassicHeader(),
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 1,
