@@ -5,10 +5,18 @@ import 'dart:math';
 import '../widgets/scratch_card.dart';
 import '../models/scratch_state.dart';
 import 'settings_screen.dart';
+import '../utils/language_utils.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.title});
+  const HomeScreen({
+    super.key,
+    required this.title,
+    required this.onLanguageChanged,
+    required this.currentLanguage,
+  });
   final String title;
+  final Function(String) onLanguageChanged;
+  final String currentLanguage;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -31,18 +39,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // デフォルトのタイトルを返す
   String _getDefaultTitle(int index) {
-    if (index < defaultConfigs.length) {
-      return defaultConfigs[index]['title']!;
-    }
-    return 'カード${index + 1}';
+    return LanguageUtils.getCardTitle(index, widget.currentLanguage);
   }
 
   // デフォルトのメッセージを返す
   String _getDefaultMessage(int index) {
-    if (index < defaultConfigs.length) {
-      return defaultConfigs[index]['completedMessage']!;
-    }
-    return '${index + 1}つ目';
+    return LanguageUtils.getCardResult(index, widget.currentLanguage);
   }
 
   final RefreshController _refreshController = RefreshController(
@@ -74,10 +76,10 @@ class _HomeScreenState extends State<HomeScreen> {
     for (int i = 0; i < cardConfigs.length; i++) {
       final multiChoice = prefs.getString('card_multichoice_$i') ?? '';
 
-      // 複数選択肢がある場合はランダムに選択
+      // 複数選択肢がある場合はランダムに選択(、または,)
       if (multiChoice.isNotEmpty) {
         final choices = multiChoice
-            .split('、')
+            .split(RegExp(r'[、,]\s*'))
             .where((s) => s.trim().isNotEmpty)
             .toList();
         if (choices.isNotEmpty) {
@@ -99,9 +101,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     final multiChoice = prefs.getString('card_multichoice_$index') ?? '';
 
-    // 複数選択肢がある場合はランダムに選択
+    // 複数選択肢がある場合はランダムに選択(、または,)
     final choices = multiChoice
-        .split('、')
+        .split(RegExp(r'[、,]\s*'))
         .where((s) => s.trim().isNotEmpty)
         .toList();
     if (choices.isNotEmpty) {
@@ -141,11 +143,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ? _getDefaultTitle(index)
           : savedTitle;
 
-      // 複数選択肢がある場合はランダムに選択
+      // 複数選択肢がある場合はランダムに選択(、または,)
       String finalMessage = _getDefaultMessage(index);
       if (multiChoice.isNotEmpty) {
         final choices = multiChoice
-            .split('、')
+            .split(RegExp(r'[、,]\s*'))
             .where((s) => s.trim().isNotEmpty)
             .toList();
         if (choices.isNotEmpty) {
@@ -212,12 +214,20 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                MaterialPageRoute(
+                  builder: (context) => SettingsScreen(
+                    onLanguageChanged: widget.onLanguageChanged,
+                    currentLanguage: widget.currentLanguage,
+                  ),
+                ),
               );
               _loadSettings();
             },
             icon: const Icon(Icons.settings, color: Colors.black87, size: 28),
-            tooltip: '設定',
+            tooltip: LanguageUtils.getSettingsText(
+              'settings',
+              widget.currentLanguage,
+            ),
           ),
         ],
       ),
