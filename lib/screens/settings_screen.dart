@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/language_utils.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  const SettingsScreen({
+    super.key,
+    required this.onLanguageChanged,
+    required this.currentLanguage,
+  });
+  final Function(String) onLanguageChanged;
+  final String currentLanguage;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -45,11 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // デフォルトのタイトルを返す
   String _getDefaultTitle(int index) {
-    final titles = ['カード1', 'カード2', 'カード3', 'カード4'];
-    if (index < titles.length) {
-      return titles[index];
-    }
-    return 'カード${index + 1}';
+    return LanguageUtils.getCardTitle(index, widget.currentLanguage);
   }
 
   // 設定を読み込む
@@ -164,9 +167,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '設定',
-          style: TextStyle(
+        title: Text(
+          LanguageUtils.getSettingsText('settings', widget.currentLanguage),
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
@@ -175,15 +178,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
+          // 言語切り替えボタン
+          GestureDetector(
+            onTap: () {
+              final newLanguage = widget.currentLanguage == 'ja' ? 'en' : 'ja';
+              widget.onLanguageChanged(newLanguage);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Text(
+                LanguageUtils.getFlag(widget.currentLanguage),
+                style: const TextStyle(fontSize: 20),
+              ),
+            ),
+          ),
           IconButton(
             onPressed: _resetToDefaults,
             icon: const Icon(Icons.restore, color: Colors.black87, size: 28),
-            tooltip: 'デフォルトに戻す',
+            tooltip: LanguageUtils.getSettingsText(
+              'resetToDefaults',
+              widget.currentLanguage,
+            ),
           ),
           IconButton(
             onPressed: _addCard,
             icon: const Icon(Icons.add, color: Colors.black87, size: 28),
-            tooltip: 'カードを追加',
+            tooltip: LanguageUtils.getSettingsText(
+              'addCard',
+              widget.currentLanguage,
+            ),
           ),
         ],
       ),
@@ -212,7 +240,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'カード ${index + 1}',
+                                '${LanguageUtils.getSettingsText('card', widget.currentLanguage)} ${index + 1}',
                                 style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -226,7 +254,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     Icons.delete,
                                     color: Colors.red,
                                   ),
-                                  tooltip: 'カードを削除',
+                                  tooltip: LanguageUtils.getSettingsText(
+                                    'deleteCard',
+                                    widget.currentLanguage,
+                                  ),
                                 ),
                             ],
                           ),
@@ -293,12 +324,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   width: 2,
                                 ),
                               ),
-                              hintText: '例: 犬、猫、鳥',
+                              hintText: LanguageUtils.getSettingsText(
+                                'example',
+                                widget.currentLanguage,
+                              ),
                               hintStyle: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 16,
                               ),
-                              helperText: '複数の選択肢を「、」で区切って入力してください',
+                              helperText: LanguageUtils.getSettingsText(
+                                'multipleChoices',
+                                widget.currentLanguage,
+                              ),
                               helperStyle: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 14,
@@ -330,7 +367,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   elevation: 2,
                 ),
                 child: Text(
-                  isSaved ? 'Saved' : 'Save',
+                  isSaved
+                      ? LanguageUtils.getSettingsText(
+                          'saved',
+                          widget.currentLanguage,
+                        )
+                      : LanguageUtils.getSettingsText(
+                          'save',
+                          widget.currentLanguage,
+                        ),
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
