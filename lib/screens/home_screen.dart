@@ -5,6 +5,7 @@ import 'dart:math';
 import '../widgets/scratch_card.dart';
 import '../models/scratch_state.dart';
 import 'settings_screen.dart';
+import 'privacy_policy_screen.dart';
 import '../utils/language_utils.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -201,13 +202,35 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text(
-          widget.title,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
+        title: Row(
+          children: [
+            Text(
+              widget.title,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PrivacyPolicyScreen(
+                      currentLanguage: widget.currentLanguage,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.privacy_tip,
+                color: Colors.black87,
+                size: 22,
+              ),
+              tooltip: 'プライバシーポリシー',
+            ),
+          ],
         ),
         actions: [
           IconButton(
