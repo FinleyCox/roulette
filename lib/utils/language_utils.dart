@@ -16,11 +16,11 @@ class LanguageUtils {
   static String getFlag(String languageCode) {
     switch (languageCode) {
       case 'ja':
-        return '🇯🇵';
+        return 'JA';
       case 'en':
-        return '🇬🇧';
+        return 'EN';
       default:
-        return '🇯🇵';
+        return 'JA';
     }
   }
 
