@@ -217,173 +217,175 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       // 設定画面の本体(タイトルと内容を入力)
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: cardCount,
-                itemBuilder: (context, index) {
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    elevation: 8,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${LanguageUtils.getSettingsText('card', widget.currentLanguage)} ${index + 1}',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              if (cardCount > 1)
-                                IconButton(
-                                  onPressed: () => _removeCard(index),
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                  tooltip: LanguageUtils.getSettingsText(
-                                    'deleteCard',
-                                    widget.currentLanguage,
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          TextField(
-                            controller: titleControllers[index],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Colors.blue,
-                                  width: 2,
-                                ),
-                              ),
-                              hintText: _getDefaultTitle(index),
-                              hintStyle: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 16,
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          TextField(
-                            controller: multiChoiceControllers[index],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Colors.blue,
-                                  width: 2,
-                                ),
-                              ),
-                              hintText: LanguageUtils.getSettingsText(
-                                'example',
-                                widget.currentLanguage,
-                              ),
-                              hintStyle: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 16,
-                              ),
-                              helperText: LanguageUtils.getSettingsText(
-                                'multipleChoices',
-                                widget.currentLanguage,
-                              ),
-                              helperStyle: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 14,
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                            ),
-                          ),
-                        ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: cardCount,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      elevation: 8,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _saveSettings,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: isSaved
-                      ? Colors.orange[400]
-                      : Colors.blue[600],
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
-                ),
-                child: Text(
-                  isSaved
-                      ? LanguageUtils.getSettingsText(
-                          'saved',
-                          widget.currentLanguage,
-                        )
-                      : LanguageUtils.getSettingsText(
-                          'save',
-                          widget.currentLanguage,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${LanguageUtils.getSettingsText('card', widget.currentLanguage)} ${index + 1}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                if (cardCount > 1)
+                                  IconButton(
+                                    onPressed: () => _removeCard(index),
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    tooltip: LanguageUtils.getSettingsText(
+                                      'deleteCard',
+                                      widget.currentLanguage,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            TextField(
+                              controller: titleControllers[index],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                    color: Colors.blue,
+                                    width: 2,
+                                  ),
+                                ),
+                                hintText: _getDefaultTitle(index),
+                                hintStyle: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[50],
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            TextField(
+                              controller: multiChoiceControllers[index],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                    color: Colors.blue,
+                                    width: 2,
+                                  ),
+                                ),
+                                hintText: LanguageUtils.getSettingsText(
+                                  'example',
+                                  widget.currentLanguage,
+                                ),
+                                hintStyle: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                ),
+                                helperText: LanguageUtils.getSettingsText(
+                                  'multipleChoices',
+                                  widget.currentLanguage,
+                                ),
+                                helperStyle: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[50],
+                              ),
+                            ),
+                          ],
                         ),
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _saveSettings,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: isSaved
+                        ? Colors.orange[400]
+                        : Colors.blue[600],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
+                  ),
+                  child: Text(
+                    isSaved
+                        ? LanguageUtils.getSettingsText(
+                            'saved',
+                            widget.currentLanguage,
+                          )
+                        : LanguageUtils.getSettingsText(
+                            'save',
+                            widget.currentLanguage,
+                          ),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

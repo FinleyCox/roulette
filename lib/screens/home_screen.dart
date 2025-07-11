@@ -234,36 +234,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // メインの部分
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: SmartRefresher(
-          controller: _refreshController,
-          enablePullDown: true,
-          onRefresh: () async {
-            _resetAll();
-            await Future.delayed(const Duration(milliseconds: 500));
-            _refreshController.refreshCompleted();
-          },
-          header: const ClassicHeader(),
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 1,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 2.3,
-            ),
-            itemCount: scratchStates.length,
-            itemBuilder: (context, index) {
-              final config = cardConfigs[index];
-              return ScratchCard(
-                key: cardKeys[index],
-                index: index + 1,
-                cardTitle: config['title']!,
-                completedMessage: config['completedMessage']!,
-                onScratch: () => _onScratch(index),
-                onReset: () => _resetScratcher(index),
-              );
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(18.0),
+          child: SmartRefresher(
+            controller: _refreshController,
+            enablePullDown: true,
+            onRefresh: () async {
+              _resetAll();
+              await Future.delayed(const Duration(milliseconds: 500));
+              _refreshController.refreshCompleted();
             },
+            header: const ClassicHeader(),
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 1,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 2.3,
+              ),
+              itemCount: scratchStates.length,
+              itemBuilder: (context, index) {
+                final config = cardConfigs[index];
+                return ScratchCard(
+                  key: cardKeys[index],
+                  index: index + 1,
+                  cardTitle: config['title']!,
+                  completedMessage: config['completedMessage']!,
+                  onScratch: () => _onScratch(index),
+                  onReset: () => _resetScratcher(index),
+                );
+              },
+            ),
           ),
         ),
       ),
