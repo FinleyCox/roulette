@@ -122,7 +122,7 @@ class LanguageUtils {
         case 'multipleChoices':
           return '複数の選択肢を「、」で区切って入力してください';
         case 'example':
-          return '例: 犬、猫、鳥';
+          return '例: 雨の日、街角、犬が';
         case 'card':
           return 'カード';
         case 'resetToDefaults':
