@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'utils/language_utils.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // AdMobを初期化
+  await MobileAds.instance.initialize();
+
   runApp(const MyApp());
 }
 
