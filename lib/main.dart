@@ -3,12 +3,17 @@ import 'screens/home_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'utils/language_utils.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'utils/app_open_ad_manager.dart';
+import 'widgets/app_lifecycle_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // AdMobを初期化
   await MobileAds.instance.initialize();
+
+  // App Open Adを読み込む
+  AppOpenAdManager.loadAd();
 
   runApp(const MyApp());
 }
@@ -67,10 +72,12 @@ class _MyAppState extends State<MyApp> {
       ],
       supportedLocales: const [Locale("ja", "JP"), Locale("en", "US")],
 
-      home: HomeScreen(
-        title: 'simple scratch',
-        onLanguageChanged: _changeLanguage,
-        currentLanguage: _currentLanguage,
+      home: AppLifecycleManager(
+        child: HomeScreen(
+          title: 'simple scratch',
+          onLanguageChanged: _changeLanguage,
+          currentLanguage: _currentLanguage,
+        ),
       ),
     );
   }
