@@ -8,6 +8,7 @@ class ScratchCard extends StatefulWidget {
   final int index;
   final String cardTitle;
   final String completedMessage;
+  final String instructionText;
   final VoidCallback? onExternalReset;
   final VoidCallback? onCardReset;
 
@@ -18,6 +19,7 @@ class ScratchCard extends StatefulWidget {
     required this.index,
     required this.cardTitle,
     required this.completedMessage,
+    required this.instructionText,
     this.onExternalReset,
     this.onCardReset,
   });
@@ -48,78 +50,76 @@ class _ScratchCardState extends State<ScratchCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 10,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE0E0E0)),
+      ),
+      padding: const EdgeInsets.all(16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // カード番号表示
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(color: Colors.white),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: Row(
-                children: [
-                  Text(
-                    widget.cardTitle,
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  Expanded(child: Container()),
-                  IconButton(
-                    onPressed: _resetScratcher,
-                    icon: const Icon(Icons.undo),
-                    color: Colors.black,
-                    alignment: Alignment.centerRight,
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // スクラッチエリア
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-              ),
-              alignment: Alignment.center,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-                child: Scratcher(
-                  key: scratchKey,
-                  brushSize: 30,
-                  threshold: 50,
-                  color: const Color.fromARGB(255, 219, 216, 216),
-                  onThreshold: () {
-                    setState(() {
-                      isCompleted = true;
-                    });
-                    widget.onScratch();
-                  },
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Center(
-                      child: Text(
-                        widget.completedMessage,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.cardTitle,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
                       ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.instructionText,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: _resetScratcher,
+                icon: const Icon(Icons.restart_alt),
+                color: Colors.black,
+                splashRadius: 20,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(height: 1, color: Color(0xFFE0E0E0)),
+          const SizedBox(height: 12),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Scratcher(
+                key: scratchKey,
+                brushSize: 30,
+                threshold: 50,
+                color: const Color(0xFFDBD8D8),
+                onThreshold: () {
+                  setState(() {
+                    isCompleted = true;
+                  });
+                  widget.onScratch();
+                },
+                child: Container(
+                  width: double.infinity,
+                  color: const Color(0xFFF9F7F5),
+                  alignment: Alignment.center,
+                  child: Text(
+                    widget.completedMessage,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
