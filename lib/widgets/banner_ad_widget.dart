@@ -12,32 +12,71 @@ class BannerAdWidget extends StatefulWidget {
 class _BannerAdWidgetState extends State<BannerAdWidget> {
   BannerAd? _bannerAd;
   bool _isLoaded = false;
-  bool _isLoading = true;
+  bool _isLoading = false;
+  bool _hasRequestedAd = false;
+  int _retryCount = 0;
+  static const int _maxRetryCount = 3;
 
   @override
   void initState() {
     super.initState();
-    _loadAd();
   }
 
-  void _loadAd() {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasRequestedAd) {
+      _hasRequestedAd = true;
+      _loadAd();
+    }
+  }
+
+  Future<void> _loadAd() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
+
+    final adSize = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+      MediaQuery.of(context).size.width.truncate(),
+    );
+
+    if (!mounted) return;
+
+    if (adSize == null) {
+      setState(() {
+        _isLoading = false;
+        _isLoaded = false;
+      });
+      return;
+    }
+
+    _bannerAd?.dispose();
     _bannerAd = BannerAd(
       adUnitId: AdManager.bannerAdUnitId,
       request: const AdRequest(),
-      size: AdSize.banner,
+      size: adSize,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
+          if (!mounted) return;
           setState(() {
             _isLoaded = true;
             _isLoading = false;
+            _retryCount = 0;
           });
         },
         onAdFailedToLoad: (ad, error) {
-          print('Banner ad failed to load: $error');
           ad.dispose();
-          setState(() {
-            _isLoading = false;
-          });
+          if (!mounted) return;
+          if (_retryCount < _maxRetryCount) {
+            _retryCount++;
+            Future.delayed(Duration(seconds: 2 * _retryCount), _loadAd);
+          } else {
+            setState(() {
+              _isLoading = false;
+              _isLoaded = false;
+            });
+          }
         },
       ),
     );
@@ -55,8 +94,7 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const SizedBox(
-        width: 320,
-        height: 50,
+        height: 60,
         child: Center(child: CircularProgressIndicator()),
       );
     }
@@ -65,14 +103,16 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      width: _bannerAd!.size.width.toDouble(),
-      height: _bannerAd!.size.height.toDouble(),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(4),
+    return Center(
+      child: Container(
+        width: _bannerAd!.size.width.toDouble(),
+        height: _bannerAd!.size.height.toDouble(),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: AdWidget(ad: _bannerAd!),
       ),
-      child: AdWidget(ad: _bannerAd!),
     );
   }
 }

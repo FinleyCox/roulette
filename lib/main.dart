@@ -64,6 +64,7 @@ class _MyAppState extends State<MyApp> {
       ),
       themeMode: ThemeMode.light,
       darkTheme: ThemeData.dark(),
+      debugShowCheckedModeBanner: false,
 
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

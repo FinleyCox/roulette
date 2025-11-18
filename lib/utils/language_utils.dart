@@ -86,6 +86,13 @@ class LanguageUtils {
     }
   }
 
+  static String getScratchInstruction(String languageCode) {
+    if (languageCode == 'en') {
+      return 'Slide your finger to reveal the choice';
+    }
+    return '指でこすると結果が表示されます';
+  }
+
   // 設定画面のテキストを取得
   static String getSettingsText(String key, String languageCode) {
     if (languageCode == 'en') {

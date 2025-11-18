@@ -31,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
   late List<ScratchState> scratchStates;
   List<Key> cardKeys = [];
   AppOpenAd? _appOpenAd;
-  bool _isAdLoaded = false;
 
   List<Map<String, String>> cardConfigs = [];
 
@@ -211,7 +210,6 @@ class _HomeScreenState extends State<HomeScreen> {
         onAdLoaded: (ad) {
           setState(() {
             _appOpenAd = ad;
-            _isAdLoaded = true;
           });
           _showAppOpenAd();
         },
@@ -236,7 +234,6 @@ class _HomeScreenState extends State<HomeScreen> {
       onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
         _appOpenAd = null;
-        _isAdLoaded = false;
       },
     );
 
@@ -251,19 +248,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const Color scaffoldColor = Color(0xFFF4F4F1);
     return Scaffold(
-      // 上部
+      backgroundColor: scaffoldColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: scaffoldColor,
         elevation: 0,
+        centerTitle: false,
+        titleSpacing: 16,
         title: Row(
           children: [
-            Text(
-              widget.title,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
               ),
             ),
             IconButton(
@@ -282,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.black87,
                 size: 22,
               ),
-              tooltip: 'プライバシーポリシー',
+              tooltip: 'privacy',
             ),
           ],
         ),
@@ -310,13 +317,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       // メインの部分
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(18.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: SmartRefresher(
                   controller: _refreshController,
                   enablePullDown: true,
@@ -330,9 +336,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 1,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 2.3,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 2.4,
                         ),
                     itemCount: scratchStates.length,
                     itemBuilder: (context, index) {
@@ -342,6 +348,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         index: index + 1,
                         cardTitle: config['title']!,
                         completedMessage: config['completedMessage']!,
+                        instructionText: LanguageUtils.getScratchInstruction(
+                          widget.currentLanguage,
+                        ),
                         onScratch: () => _onScratch(index),
                         onReset: () => _resetScratcher(index),
                       );
@@ -353,7 +362,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // バナー広告
             Container(
               width: double.infinity,
-              color: Colors.white,
+              color: scaffoldColor,
               child: const BannerAdWidget(),
             ),
           ],
