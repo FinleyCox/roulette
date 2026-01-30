@@ -5,6 +5,7 @@ import 'utils/language_utils.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'utils/app_open_ad_manager.dart';
 import 'widgets/app_lifecycle_manager.dart';
+import 'utils/purchase_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +15,8 @@ void main() async {
 
   // App Open Adを読み込む
   AppOpenAdManager.loadAd();
+
+  await PurchaseManager().init();
 
   runApp(const MyApp());
 }
@@ -37,7 +40,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> _loadLanguage() async {
     final language = await LanguageUtils.getCurrentLanguage();
     setState(() {
-      _currentLanguage = language;
+      _currentLanguage = language ?? 'ja';
     });
   }
 
@@ -71,7 +74,11 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale("ja", "JP"), Locale("en", "US")],
+      supportedLocales: const [
+        Locale("ja", "JP"),
+        Locale("en", "US"),
+        Locale("hi", "IN"),
+      ],
 
       home: AppLifecycleManager(
         child: HomeScreen(

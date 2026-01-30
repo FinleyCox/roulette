@@ -3,9 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LanguageUtils {
   static const String _languageKey = 'selected_language';
 
-  static Future<String> getCurrentLanguage() async {
+  static Future<String?> getCurrentLanguage() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_languageKey) ?? 'ja';
+    return prefs.getString(_languageKey);
   }
 
   static Future<void> setLanguage(String languageCode) async {
@@ -19,6 +19,8 @@ class LanguageUtils {
         return 'JA';
       case 'en':
         return 'EN';
+      case 'hi':
+        return 'HI';
       default:
         return 'JA';
     }
@@ -27,68 +29,30 @@ class LanguageUtils {
   // カードタイトルを取得
   static String getCardTitle(int index, String languageCode) {
     if (languageCode == 'en') {
-      switch (index) {
-        case 0:
-          return 'Card 1';
-        case 1:
-          return 'Card 2';
-        case 2:
-          return 'Card 3';
-        case 3:
-          return 'Card 4';
-        default:
-          return 'Card ${index + 1}';
-      }
+      return 'Card ${index + 1}';
+    } else if (languageCode == 'hi') {
+      return 'कार्ड ${index + 1}';
     } else {
-      switch (index) {
-        case 0:
-          return 'カード1';
-        case 1:
-          return 'カード2';
-        case 2:
-          return 'カード3';
-        case 3:
-          return 'カード4';
-        default:
-          return 'カード${index + 1}';
-      }
+      return 'カード${index + 1}';
     }
   }
 
   // カード結果を取得
   static String getCardResult(int index, String languageCode) {
     if (languageCode == 'en') {
-      switch (index) {
-        case 0:
-          return 'Card 1 Result';
-        case 1:
-          return 'Card 2 Result';
-        case 2:
-          return 'Card 3 Result';
-        case 3:
-          return 'Card 4 Result';
-        default:
-          return '${index + 1}st Result';
-      }
+      return '${index + 1}st Result';
+    } else if (languageCode == 'hi') {
+      return 'कार्ड ${index + 1} परिणाम';
     } else {
-      switch (index) {
-        case 0:
-          return 'カード1の結果';
-        case 1:
-          return 'カード2の結果';
-        case 2:
-          return 'カード3の結果';
-        case 3:
-          return 'カード4の結果';
-        default:
-          return '${index + 1}つ目';
-      }
+      return 'カード${index + 1}の結果';
     }
   }
 
   static String getScratchInstruction(String languageCode) {
     if (languageCode == 'en') {
       return 'Slide your finger to reveal the choice';
+    } else if (languageCode == 'hi') {
+      return 'परिणाम देखने के लिए अपनी उंगली से स्वाइप करें';
     }
     return '指でこすると結果が表示されます';
   }
@@ -115,6 +79,29 @@ class LanguageUtils {
           return 'Add Card';
         case 'deleteCard':
           return 'Delete Card';
+        default:
+          return key;
+      }
+    } else if (languageCode == 'hi') {
+      switch (key) {
+        case 'settings':
+          return 'सेटिंग्स';
+        case 'save':
+          return 'सहेजें';
+        case 'saved':
+          return 'सहेज लिया';
+        case 'multipleChoices':
+          return 'अनेक विकल्प (कॉमा से अलग करें)';
+        case 'example':
+          return 'उदा: कुत्ता, बिल्ली, पक्षी';
+        case 'card':
+          return 'कार्ड';
+        case 'resetToDefaults':
+          return 'डिफ़ॉल्ट पर रीसेट करें';
+        case 'addCard':
+          return 'कार्ड जोड़ें';
+        case 'deleteCard':
+          return 'कार्ड हटाएँ';
         default:
           return key;
       }
@@ -177,6 +164,37 @@ class LanguageUtils {
         default:
           return key;
       }
+    } else if (languageCode == 'hi') {
+      switch (key) {
+        case 'privacyPolicy':
+          return 'गोपनीयता नीति';
+        case 'privacyPolicyTitle':
+          return 'गोपनीयता नीति (simple scratch)';
+        case 'privacyPolicyDescription':
+          return 'simple scratch (इसके बाद "यह ऐप") उपयोगकर्ता की गोपनीयता का सम्मान करता है।\nयह ऐप कोई भी व्यक्तिगत जानकारी एकत्र, संग्रहीत या प्रसारित नहीं करता है।';
+        case 'informationCollected':
+          return '1. एकत्र की गई जानकारी';
+        case 'informationCollectedDescription':
+          return 'यह ऐप निम्नलिखित जानकारी एकत्र नहीं करता है:\n\n• नाम और ईमेल पते जैसी व्यक्तिगत पहचान जानकारी\n• जीपीएस जैसी स्थान जानकारी\n• अन्य ऐप्स की उपयोग स्थिति';
+        case 'dataTransmission':
+          return '2. डेटा प्रसारण और भंडारण';
+        case 'dataTransmissionDescription':
+          return 'यह ऐप इंटरनेट पर डेटा प्रसारित नहीं करता है या बाहरी सर्वर पर जानकारी संग्रहीत नहीं करता है।\nसभी उपयोगकर्ता डेटा डिवाइस पर संग्रहीत किया जाता है।';
+        case 'advertising':
+          return '3. विज्ञापन';
+        case 'advertisingDescription':
+          return 'यह ऐप विज्ञापन प्रदर्शित नहीं करता है।';
+        case 'contact':
+          return '4. संपर्क';
+        case 'contactDescription':
+          return 'इस गोपनीयता नीति के बारे में प्रश्नों के लिए, कृपया नीचे दिए गए ईमेल पते पर हमसे संपर्क करें।';
+        case 'revision':
+          return '5. संशोधन';
+        case 'revisionDescription':
+          return 'इस नीति को बिना किसी सूचना के संशोधित किया जा सकता है। अद्यतन नीतियां इस ऐप या वितरण पृष्ठ पर प्रकाशित की जाएंगी।';
+        default:
+          return key;
+      }
     } else {
       switch (key) {
         case 'privacyPolicy':
@@ -196,7 +214,7 @@ class LanguageUtils {
         case 'advertising':
           return '3. 広告について';
         case 'advertisingDescription':
-          return '本アプリには広告が表示されません。';
+          return '本アプリには広告が表示されます。';
         case 'contact':
           return '4. お問い合わせ';
         case 'contactDescription':

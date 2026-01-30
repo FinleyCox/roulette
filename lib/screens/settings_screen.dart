@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/language_utils.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'dart:convert';
+import 'qr_scanner_screen.dart';
+import '../utils/purchase_manager.dart';
+import 'presets_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
@@ -25,12 +30,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    // 初期コントローラーを追加
     _ensureControllers(4);
     _loadSettings();
+    PurchaseManager().loadPurchases();
+    // Re-check IAP status when entering settings
+    PurchaseManager().purchaseUpdates.listen((_) {
+      if (mounted) setState(() {});
+    });
   }
 
-  // コントローラーの数を確保するメソッド
+  void _showPurchaseDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final pm = PurchaseManager();
+            final isTier2Purchased = pm.isTier2Purchased();
+
+            return AlertDialog(
+              title: const Text('Upgrade Plan'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    title: const Text('Tier 1 (Max +3 Sets)'),
+                    subtitle: const Text('¥100'),
+                    onTap: () {
+                      pm.buyProduct(PurchaseManager.productTier1);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  if (!isTier2Purchased)
+                    ListTile(
+                      title: const Text('Tier 2 (Max 10 Sets + Ad Free)'),
+                      subtitle: const Text('¥200'),
+                      onTap: () {
+                        pm.buyProduct(PurchaseManager.productTier2);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ListTile(
+                    title: const Text('Restore Purchases'),
+                    onTap: () {
+                      pm.restorePurchases();
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Close'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _ensureControllers(int count) {
     while (titleControllers.length < count) {
       titleControllers.add(TextEditingController());
@@ -39,7 +100,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   @override
-  // コントローラーを破棄
   void dispose() {
     for (var controller in titleControllers) {
       controller.dispose();
@@ -50,37 +110,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   }
 
-  // デフォルトのタイトルを返す
   String _getDefaultTitle(int index) {
     return LanguageUtils.getCardTitle(index, widget.currentLanguage);
   }
 
-  // 設定を読み込む
   Future<void> _loadSettings() async {
-    // 設定を取得
     final prefs = await SharedPreferences.getInstance();
-
-    // 保存されたカード数を読み込み
     final savedCardCount = prefs.getInt('card_count') ?? 4;
 
-    // カード数が変更された場合のみ更新
     if (savedCardCount != cardCount) {
       setState(() {
         cardCount = savedCardCount;
-        // コントローラーの数を調整
         _ensureControllers(cardCount);
       });
     } else {
-      // コントローラーの数を調整
       _ensureControllers(cardCount);
     }
 
-    // カード用のコントローラーを初期化
     for (int i = 0; i < cardCount; i++) {
       final savedTitle = prefs.getString('card_title_$i');
       final multiChoice = prefs.getString('card_multichoice_$i') ?? '';
 
-      // 保存されたタイトルが空またはデフォルト値と同じ場合は空にする
       if (savedTitle == null ||
           savedTitle.isEmpty ||
           savedTitle == _getDefaultTitle(i)) {
@@ -92,15 +142,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  // 設定を保存
   Future<void> _saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // カード数を保存
     await prefs.setInt('card_count', cardCount);
 
     for (int i = 0; i < cardCount; i++) {
-      // 空の場合はデフォルト値を使用
       final title = titleControllers[i].text.trim().isEmpty
           ? _getDefaultTitle(i)
           : titleControllers[i].text;
@@ -110,12 +157,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await prefs.setString('card_multichoice_$i', multiChoice);
     }
 
-    // 保存状態を更新
     setState(() {
       isSaved = true;
     });
 
-    // 1秒後にボタンを元に戻す
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
@@ -125,42 +170,176 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  // デフォルトの設定に戻す(右上のボタン)
   void _resetToDefaults() {
-    for (int i = 0; i < cardCount; i++) {
-      titleControllers[i].text = _getDefaultTitle(i);
-      multiChoiceControllers[i].text = '';
-    }
-    _saveSettings();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          LanguageUtils.getSettingsText(
+            'resetToDefaults',
+            widget.currentLanguage,
+          ),
+        ),
+        content: Text(
+          widget.currentLanguage == 'ja'
+              ? '現在入力されているものをリセットしますか？' // Custom JP message
+              : 'Are you sure you want to reset current settings?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              for (int i = 0; i < cardCount; i++) {
+                titleControllers[i].text = _getDefaultTitle(i);
+                multiChoiceControllers[i].text = '';
+              }
+              _saveSettings();
+            },
+            child: const Text('Reset', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 
-  // カードを追加するメソッド
   void _addCard() async {
     setState(() {
       cardCount++;
       _ensureControllers(cardCount);
-      // 新しいカードのデフォルト値を設定
       titleControllers[cardCount - 1].text = _getDefaultTitle(cardCount - 1);
       multiChoiceControllers[cardCount - 1].text = '';
     });
-    // 追加後に即座に保存
     await _saveSettings();
   }
 
-  // カードを削除するメソッド
   void _removeCard(int index) async {
     if (cardCount > 1) {
       setState(() {
         cardCount--;
-        // 削除されたカード以降のデータをシフト
         for (int i = index; i < cardCount; i++) {
           titleControllers[i].text = titleControllers[i + 1].text;
           multiChoiceControllers[i].text = multiChoiceControllers[i + 1].text;
         }
       });
-      // 削除後に即座に保存
       await _saveSettings();
     }
+  }
+
+  void _showQRCode() {
+    final Map<String, dynamic> data = {
+      'cardCount': cardCount,
+      'cards': List.generate(
+        cardCount,
+        (index) => {
+          'title': titleControllers[index].text,
+          'multiChoice': multiChoiceControllers[index].text,
+        },
+      ),
+    };
+    final jsonString = jsonEncode(data);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Share Settings'),
+        content: SizedBox(
+          width: 250,
+          height: 250,
+          child: QrImageView(
+            data: jsonString,
+            version: QrVersions.auto,
+            backgroundColor: Colors.white,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _scanQRCode() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const QRScannerScreen()),
+    );
+
+    if (result != null && result is String) {
+      try {
+        final Map<String, dynamic> data = jsonDecode(result);
+        if (data.containsKey('cardCount') && data.containsKey('cards')) {
+          setState(() {
+            cardCount = data['cardCount'];
+            _ensureControllers(cardCount);
+            final List<dynamic> cards = data['cards'];
+            for (int i = 0; i < cardCount; i++) {
+              if (i < cards.length) {
+                titleControllers[i].text = cards[i]['title'] ?? '';
+                multiChoiceControllers[i].text = cards[i]['multiChoice'] ?? '';
+              }
+            }
+          });
+          await _saveSettings();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Settings imported successfully!')),
+            );
+          }
+        }
+      } catch (e) {
+        debugPrint('Error parsing QR: $e');
+        // ignore
+      }
+    }
+  }
+
+  void _openPresetManager() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PresetsScreen(
+          currentLanguage: widget.currentLanguage,
+          currentSettings: {
+            'cardCount': cardCount,
+            'cards': List.generate(
+              cardCount,
+              (index) => {
+                'title': titleControllers[index].text,
+                'multiChoice': multiChoiceControllers[index].text,
+              },
+            ),
+          },
+          onLoadPreset: (data) {
+            // Load callback
+            if (data != null) {
+              setState(() {
+                cardCount = data['cardCount'];
+                _ensureControllers(cardCount);
+                final List<dynamic> cards = data['cards'];
+                for (int i = 0; i < cardCount; i++) {
+                  if (i < cards.length) {
+                    titleControllers[i].text = cards[i]['title'] ?? '';
+                    multiChoiceControllers[i].text =
+                        cards[i]['multiChoice'] ?? '';
+                  }
+                }
+              });
+              _saveSettings();
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Preset Loaded')));
+            }
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -181,7 +360,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // 言語切り替えボタン
           GestureDetector(
             onTap: () {
-              final newLanguage = widget.currentLanguage == 'ja' ? 'en' : 'ja';
+              final newLanguage = widget.currentLanguage == 'ja'
+                  ? 'en'
+                  : widget.currentLanguage == 'en'
+                  ? 'hi'
+                  : 'ja';
               widget.onLanguageChanged(newLanguage);
             },
             child: Container(
@@ -213,15 +396,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
               widget.currentLanguage,
             ),
           ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.qr_code, color: Colors.black87, size: 28),
+            onSelected: (value) {
+              if (value == 'share') {
+                _showQRCode();
+              } else if (value == 'scan') {
+                _scanQRCode();
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'share',
+                child: ListTile(
+                  leading: Icon(Icons.share),
+                  title: Text('Share via QR'),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'scan',
+                child: ListTile(
+                  leading: Icon(Icons.qr_code_scanner),
+                  title: Text('Scan QR'),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
-      // 設定画面の本体(タイトルと内容を入力)
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
+              // Preset Manager Button
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _openPresetManager,
+                  icon: const Icon(Icons.list),
+                  label: const Text('Manage Presets'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
               Expanded(
                 child: ListView.builder(
                   itemCount: cardCount,
@@ -383,6 +605,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
+              ),
+              // Upgrade Button if not ad-free or just reachable via presets
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: _showPurchaseDialog,
+                child: const Text('Upgrade Plan / Restore'),
               ),
             ],
           ),

@@ -187,27 +187,6 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
-                GestureDetector(
-                  onTap: () async {
-                    final Uri url = Uri.parse('https://github.com/FinleyCox');
-                    await launchUrl(url, mode: LaunchMode.externalApplication);
-                  },
-                  child: const Row(
-                    children: [
-                      Icon(Icons.link, color: Colors.blue, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'GitHub : https://github.com/FinleyCox',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 const SizedBox(height: 24),
                 Text(
                   LanguageUtils.getPrivacyPolicyText(
