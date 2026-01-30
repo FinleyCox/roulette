@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'dart:math';
 import '../widgets/scratch_card.dart';
 import '../widgets/banner_ad_widget.dart';
@@ -10,6 +11,7 @@ import '../utils/ad_manager.dart';
 import 'settings_screen.dart';
 import 'privacy_policy_screen.dart';
 import '../utils/language_utils.dart';
+import 'package:roulette/utils/purchase_manager.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -172,10 +174,21 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _onScratch(int index) {
+  void _onScratch(int index) async {
     setState(() {
       scratchStates[index].increment();
     });
+
+    final prefs = await SharedPreferences.getInstance();
+    int count = (prefs.getInt('scratch_completed_count') ?? 0) + 1;
+    await prefs.setInt('scratch_completed_count', count);
+
+    if (count % 10 == 0) {
+      final InAppReview inAppReview = InAppReview.instance;
+      if (await inAppReview.isAvailable()) {
+        inAppReview.requestReview();
+      }
+    }
   }
 
   void _resetScratcher(int index) async {
@@ -202,6 +215,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // App Open Adを読み込む
   void _loadAppOpenAd() {
+    if (PurchaseManager().isAdFree()) return;
+
     AppOpenAd.load(
       adUnitId: AdManager.appOpenAdUnitId,
       orientation: AppOpenAd.orientationPortrait,
@@ -322,7 +337,10 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: SmartRefresher(
                   controller: _refreshController,
                   enablePullDown: true,
@@ -360,11 +378,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             // バナー広告
-            Container(
-              width: double.infinity,
-              color: scaffoldColor,
-              child: const BannerAdWidget(),
-            ),
+            if (!PurchaseManager().isAdFree())
+              Container(
+                width: double.infinity,
+                color: scaffoldColor,
+                child: const BannerAdWidget(),
+              ),
           ],
         ),
       ),

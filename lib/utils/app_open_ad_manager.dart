@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'ad_manager.dart';
 
@@ -16,10 +17,10 @@ class AppOpenAdManager {
         onAdLoaded: (ad) {
           _appOpenAd = ad;
           _isAdAvailable = true;
-          print('App Open Ad loaded successfully');
+          debugPrint('App Open Ad loaded successfully');
         },
         onAdFailedToLoad: (error) {
-          print('App Open Ad failed to load: $error');
+          debugPrint('App Open Ad failed to load: $error');
           _isAdAvailable = false;
         },
       ),
@@ -35,10 +36,10 @@ class AppOpenAdManager {
     _isShowingAd = true;
     _appOpenAd!.fullScreenContentCallback = FullScreenContentCallback(
       onAdShowedFullScreenContent: (ad) {
-        print('App Open Ad showed full screen content');
+        debugPrint('App Open Ad showed full screen content');
       },
       onAdDismissedFullScreenContent: (ad) {
-        print('App Open Ad dismissed');
+        debugPrint('App Open Ad dismissed');
         ad.dispose();
         _appOpenAd = null;
         _isAdAvailable = false;
@@ -47,7 +48,7 @@ class AppOpenAdManager {
         loadAd();
       },
       onAdFailedToShowFullScreenContent: (ad, error) {
-        print('App Open Ad failed to show: $error');
+        debugPrint('App Open Ad failed to show: $error');
         ad.dispose();
         _appOpenAd = null;
         _isAdAvailable = false;
