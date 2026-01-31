@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/preset_manager.dart';
 import '../utils/purchase_manager.dart';
+import '../utils/language_utils.dart';
 
 class PresetsScreen extends StatefulWidget {
   final String currentLanguage;
@@ -41,17 +42,19 @@ class _PresetsScreenState extends State<PresetsScreen> {
         String input = '';
         return AlertDialog(
           title: Text(
-            widget.currentLanguage == 'ja'
-                ? '現在の入力内容でプリセットを保存'
-                : 'Save Current Input as Preset',
+            LanguageUtils.getSettingsText(
+              'savePresetTitle',
+              widget.currentLanguage,
+            ),
           ),
           content: TextField(
             autofocus: true,
             onChanged: (v) => input = v,
             decoration: InputDecoration(
-              hintText: widget.currentLanguage == 'ja'
-                  ? 'プリセット名'
-                  : 'Preset Name',
+              hintText: LanguageUtils.getSettingsText(
+                'presetNameHint',
+                widget.currentLanguage,
+              ),
             ),
           ),
           actions: [
@@ -79,7 +82,10 @@ class _PresetsScreenState extends State<PresetsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                widget.currentLanguage == 'ja' ? '保存しました' : 'Preset saved',
+                LanguageUtils.getSettingsText(
+                  'presetSaved',
+                  widget.currentLanguage,
+                ),
               ),
             ),
           );
@@ -95,22 +101,30 @@ class _PresetsScreenState extends State<PresetsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          widget.currentLanguage == 'ja' ? '削除の確認' : 'Confirm Delete',
+          LanguageUtils.getSettingsText(
+            'confirmDeleteTitle',
+            widget.currentLanguage,
+          ),
         ),
         content: Text(
-          widget.currentLanguage == 'ja' ? '$name を削除しますか？' : 'Delete "$name"?',
+          widget.currentLanguage == 'en' ? 'Delete "$name"?' : '$name を削除しますか？',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              LanguageUtils.getSettingsText('cancel', widget.currentLanguage),
+            ),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _deletePreset(index);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text(
+              LanguageUtils.getSettingsText('delete', widget.currentLanguage),
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -126,14 +140,21 @@ class _PresetsScreenState extends State<PresetsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Limit Reached'),
-        content: const Text(
-          'You have reached the limit of saved presets.\nUpgrade to save more.',
+        title: Text(
+          LanguageUtils.getSettingsText('limitReached', widget.currentLanguage),
+        ),
+        content: Text(
+          LanguageUtils.getSettingsText(
+            'limitReachedDesc',
+            widget.currentLanguage,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(
+              LanguageUtils.getSettingsText('close', widget.currentLanguage),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -143,7 +164,9 @@ class _PresetsScreenState extends State<PresetsScreen> {
               // Purchase logic is singleton so we can call it.
               _showPurchaseOptions();
             },
-            child: const Text('Upgrade'),
+            child: Text(
+              LanguageUtils.getSettingsText('upgrade', widget.currentLanguage),
+            ),
           ),
         ],
       ),
@@ -159,12 +182,22 @@ class _PresetsScreenState extends State<PresetsScreen> {
             final pm = PurchaseManager();
             final isTier2 = pm.isTier2Purchased();
             return AlertDialog(
-              title: const Text('Upgrade Plan'),
+              title: Text(
+                LanguageUtils.getSettingsText(
+                  'upgradePlan',
+                  widget.currentLanguage,
+                ),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ListTile(
-                    title: const Text('Tier 1 (Max +3 Sets)'),
+                    title: Text(
+                      LanguageUtils.getSettingsText(
+                        'tier1Title',
+                        widget.currentLanguage,
+                      ),
+                    ),
                     subtitle: const Text('¥100'),
                     onTap: () {
                       PurchaseManager().buyProduct(
@@ -175,7 +208,12 @@ class _PresetsScreenState extends State<PresetsScreen> {
                   ),
                   if (!isTier2)
                     ListTile(
-                      title: const Text('Tier 2 (Max 10 Sets + Ad Free)'),
+                      title: Text(
+                        LanguageUtils.getSettingsText(
+                          'tier2Title',
+                          widget.currentLanguage,
+                        ),
+                      ),
                       subtitle: const Text('¥200'),
                       onTap: () {
                         PurchaseManager().buyProduct(
@@ -189,7 +227,12 @@ class _PresetsScreenState extends State<PresetsScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Close'),
+                  child: Text(
+                    LanguageUtils.getSettingsText(
+                      'close',
+                      widget.currentLanguage,
+                    ),
+                  ),
                 ),
               ],
             );
@@ -229,9 +272,10 @@ class _PresetsScreenState extends State<PresetsScreen> {
       body: _presets.isEmpty
           ? Center(
               child: Text(
-                widget.currentLanguage == 'ja'
-                    ? '保存されたプリセットはありません'
-                    : 'No presets saved',
+                LanguageUtils.getSettingsText(
+                  'noPresets',
+                  widget.currentLanguage,
+                ),
                 style: const TextStyle(color: Colors.grey),
               ),
             )

@@ -14,7 +14,10 @@ void main() async {
   await MobileAds.instance.initialize();
 
   // App Open Adを読み込む
-  AppOpenAdManager.loadAd();
+  // App Open Adを読み込む (広告未削除の場合のみ)
+  if (!PurchaseManager().isFullAdFree()) {
+    AppOpenAdManager.loadAd();
+  }
 
   await PurchaseManager().init();
 
@@ -80,6 +83,7 @@ class _MyAppState extends State<MyApp> {
         Locale("hi", "IN"),
       ],
 
+      locale: Locale(_currentLanguage),
       home: AppLifecycleManager(
         child: HomeScreen(
           title: 'simple scratch',

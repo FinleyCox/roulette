@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../utils/language_utils.dart';
 
 class QRScannerScreen extends StatefulWidget {
-  const QRScannerScreen({super.key});
+  final String currentLanguage;
+  const QRScannerScreen({super.key, required this.currentLanguage});
 
   @override
   State<QRScannerScreen> createState() => _QRScannerScreenState();
@@ -14,7 +16,11 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Scan QR Code')),
+      appBar: AppBar(
+        title: Text(
+          LanguageUtils.getSettingsText('scanQRCode', widget.currentLanguage),
+        ),
+      ),
       body: MobileScanner(
         onDetect: (capture) {
           if (isDetected) return;
