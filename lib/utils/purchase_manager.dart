@@ -63,7 +63,7 @@ class PurchaseManager {
             }
           } else {
             _purchasedProductIds.add(purchaseDetails.productID);
-            _savePurchaseLocally(purchaseDetails.productID);
+            // _savePurchaseLocally(purchaseDetails.productID); // Non-consumables are not cached locally anymore to support revocations
           }
         }
 
@@ -114,9 +114,21 @@ class PurchaseManager {
     return limit;
   }
 
+  // Ad Removal Logic
+  // Tier 1 (100 yen): 1 purchase -> Banner removed. 2 purchases -> All ads removed.
+  // Tier 2 (200 yen): Purchase -> All ads removed (and Banner removed).
+
+  bool isBannerAdFree() {
+    return _tier1Count >= 1 || _purchasedProductIds.contains(productTier2);
+  }
+
+  bool isFullAdFree() {
+    return _tier1Count >= 2 || _purchasedProductIds.contains(productTier2);
+  }
+
+  // Deprecated: Use isBannerAdFree or isFullAdFree
   bool isAdFree() {
-    // Ad free if any purchase made (Tier 1 count > 0 OR Tier 2 purchased)
-    return _tier1Count > 0 || _purchasedProductIds.contains(productTier2);
+    return isFullAdFree();
   }
 
   // Tier 2 visibility check
@@ -125,15 +137,6 @@ class PurchaseManager {
   }
 
   // Local persistence mainly for offline start before IAP sync
-  Future<void> _savePurchaseLocally(String productId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> purchases =
-        prefs.getStringList('purchased_products') ?? [];
-    if (!purchases.contains(productId)) {
-      purchases.add(productId);
-      await prefs.setStringList('purchased_products', purchases);
-    }
-  }
 
   Future<void> _incrementTier1Count() async {
     _tier1Count++;
@@ -145,9 +148,10 @@ class PurchaseManager {
     final prefs = await SharedPreferences.getInstance();
 
     // Load Non-Consumables
-    final List<String> purchases =
-        prefs.getStringList('purchased_products') ?? [];
-    _purchasedProductIds.addAll(purchases);
+    // We intentionally do NOT load cached non-consumables (Tier 2) to avoid stale state.
+    // They are restored via restorePurchases() on every init.
+    // final List<String> purchases = prefs.getStringList('purchased_products') ?? [];
+    // _purchasedProductIds.addAll(purchases);
 
     // Load Consumable Counts
     _tier1Count = prefs.getInt('tier1_count') ?? 0;

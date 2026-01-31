@@ -79,6 +79,52 @@ class LanguageUtils {
           return 'Add Card';
         case 'deleteCard':
           return 'Delete Card';
+        case 'upgradePlan':
+          return 'Upgrade Plan';
+        case 'tier1Title':
+          return 'Preset +3 Sets + Banner Ads Removed';
+        case 'tier2Title':
+          return 'Preset +10 Sets + All Ads Removed';
+        case 'close':
+          return 'Close';
+        case 'cancel':
+          return 'Cancel';
+        case 'reset':
+          return 'Reset';
+        case 'shareSettings':
+          return 'Share Settings';
+        case 'scanQRCode':
+          return 'Scan QR Code';
+        case 'settingsImported':
+          return 'Settings imported successfully!';
+        case 'managePresets':
+          return 'Manage Presets';
+        case 'limitReached':
+          return 'Limit Reached';
+        case 'limitReachedDesc':
+          return 'You have reached the limit of saved presets.\nUpgrade to save more.';
+        case 'upgrade':
+          return 'Upgrade';
+        case 'shareViaQR':
+          return 'Share via QR';
+        case 'scanQR':
+          return 'Scan QR';
+        case 'delete':
+          return 'Delete';
+        case 'privacy':
+          return 'Privacy';
+        case 'savePresetTitle':
+          return 'Save Current Input as Preset';
+        case 'presetNameHint':
+          return 'Preset Name';
+        case 'presetSaved':
+          return 'Preset saved';
+        case 'confirmDeleteTitle':
+          return 'Confirm Delete';
+        case 'noPresets':
+          return 'No presets saved';
+        case 'resetConfirmMessage':
+          return 'Are you sure you want to reset current settings?';
         default:
           return key;
       }
@@ -102,6 +148,52 @@ class LanguageUtils {
           return 'कार्ड जोड़ें';
         case 'deleteCard':
           return 'कार्ड हटाएँ';
+        case 'upgradePlan':
+          return 'योजना अपग्रेड करें';
+        case 'tier1Title':
+          return 'Preset +3 सेट + बैनर विज्ञापन हटा दिए गए';
+        case 'tier2Title':
+          return 'Preset +10 सेट + सभी विज्ञापन हटा दिए गए';
+        case 'close':
+          return 'बंद करें';
+        case 'cancel':
+          return 'रद्द करें';
+        case 'reset':
+          return 'रीसेट';
+        case 'shareSettings':
+          return 'सेटिंग्स साझा करें';
+        case 'scanQRCode':
+          return 'क्यूआर कोड स्कैन करें';
+        case 'settingsImported':
+          return 'सेटिंग्स सफलतापूर्वक आयात की गईं!';
+        case 'managePresets':
+          return 'प्रीसेट प्रबंधित करें';
+        case 'limitReached':
+          return 'सीमा समाप्त';
+        case 'limitReachedDesc':
+          return 'आप सहेजे गए प्रीसेट की सीमा तक पहुँच गए हैं।\nअधिक सहेजने के लिए अपग्रेड करें।';
+        case 'upgrade':
+          return 'अपग्रेड';
+        case 'shareViaQR':
+          return 'क्यूआर के माध्यम से साझा करें';
+        case 'scanQR':
+          return 'क्यूआर स्कैन करें';
+        case 'delete':
+          return 'हटाएं';
+        case 'privacy':
+          return 'गोपनीयता';
+        case 'savePresetTitle':
+          return 'वर्तमान इनपुट को प्रीसेट के रूप में सहेजें';
+        case 'presetNameHint':
+          return 'प्रीसेट नाम';
+        case 'presetSaved':
+          return 'प्रीसेट सहेजा गया';
+        case 'confirmDeleteTitle':
+          return 'हटाने की पुष्टि करें';
+        case 'noPresets':
+          return 'कोई प्रीसेट सहेजा नहीं गया';
+        case 'resetConfirmMessage':
+          return 'क्या आप वाकई वर्तमान सेटिंग्स को रीसेट करना चाहते हैं?';
         default:
           return key;
       }
@@ -125,6 +217,52 @@ class LanguageUtils {
           return 'カードを追加';
         case 'deleteCard':
           return 'カードを削除';
+        case 'upgradePlan':
+          return 'プランのアップグレード';
+        case 'tier1Title':
+          return 'プリセット上限3セット + バナー広告非表示';
+        case 'tier2Title':
+          return 'プリセット上限10セット + 広告非表示';
+        case 'close':
+          return '閉じる';
+        case 'cancel':
+          return 'キャンセル';
+        case 'reset':
+          return 'リセット';
+        case 'shareSettings':
+          return '設定を共有';
+        case 'scanQRCode':
+          return 'QRコードをスキャン';
+        case 'settingsImported':
+          return '設定をインポートしました！';
+        case 'managePresets':
+          return 'プリセット管理';
+        case 'limitReached':
+          return '上限に達しました';
+        case 'limitReachedDesc':
+          return 'プリセットの保存上限に達しました。\nもっと保存するにはアップグレードしてください。';
+        case 'upgrade':
+          return 'アップグレード';
+        case 'shareViaQR':
+          return 'QRコードで共有';
+        case 'scanQR':
+          return 'QRコード読み取り';
+        case 'delete':
+          return '削除';
+        case 'privacy':
+          return 'プライバシー';
+        case 'savePresetTitle':
+          return '現在の入力内容でプリセットを保存';
+        case 'presetNameHint':
+          return 'プリセット名';
+        case 'presetSaved':
+          return '保存しました';
+        case 'confirmDeleteTitle':
+          return '削除の確認';
+        case 'noPresets':
+          return '保存されたプリセットはありません';
+        case 'resetConfirmMessage':
+          return '現在入力されているものをリセットしますか？';
         default:
           return key;
       }

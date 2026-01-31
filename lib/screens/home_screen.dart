@@ -183,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
     int count = (prefs.getInt('scratch_completed_count') ?? 0) + 1;
     await prefs.setInt('scratch_completed_count', count);
 
-    if (count % 10 == 0) {
+    if (count % 50 == 0) {
       final InAppReview inAppReview = InAppReview.instance;
       if (await inAppReview.isAvailable()) {
         inAppReview.requestReview();
@@ -215,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // App Open Adを読み込む
   void _loadAppOpenAd() {
-    if (PurchaseManager().isAdFree()) return;
+    if (PurchaseManager().isFullAdFree()) return;
 
     AppOpenAd.load(
       adUnitId: AdManager.appOpenAdUnitId,
@@ -304,7 +304,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.black87,
                 size: 22,
               ),
-              tooltip: 'privacy',
+              tooltip: LanguageUtils.getSettingsText(
+                'privacy',
+                widget.currentLanguage,
+              ),
             ),
           ],
         ),
@@ -378,7 +381,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             // バナー広告
-            if (!PurchaseManager().isAdFree())
+            if (!PurchaseManager().isBannerAdFree())
               Container(
                 width: double.infinity,
                 color: scaffoldColor,

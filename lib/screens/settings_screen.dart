@@ -49,12 +49,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
             final isTier2Purchased = pm.isTier2Purchased();
 
             return AlertDialog(
-              title: const Text('Upgrade Plan'),
+              title: Text(
+                LanguageUtils.getSettingsText(
+                  'upgradePlan',
+                  widget.currentLanguage,
+                ),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ListTile(
-                    title: const Text('Tier 1 (Max +3 Sets)'),
+                    title: Text(
+                      LanguageUtils.getSettingsText(
+                        'tier1Title',
+                        widget.currentLanguage,
+                      ),
+                    ),
                     subtitle: const Text('¥100'),
                     onTap: () {
                       pm.buyProduct(PurchaseManager.productTier1);
@@ -63,26 +73,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   if (!isTier2Purchased)
                     ListTile(
-                      title: const Text('Tier 2 (Max 10 Sets + Ad Free)'),
+                      title: Text(
+                        LanguageUtils.getSettingsText(
+                          'tier2Title',
+                          widget.currentLanguage,
+                        ),
+                      ),
                       subtitle: const Text('¥200'),
                       onTap: () {
                         pm.buyProduct(PurchaseManager.productTier2);
                         Navigator.pop(context);
                       },
                     ),
-                  ListTile(
-                    title: const Text('Restore Purchases'),
-                    onTap: () {
-                      pm.restorePurchases();
-                      Navigator.pop(context);
-                    },
-                  ),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Close'),
+                  child: Text(
+                    LanguageUtils.getSettingsText(
+                      'close',
+                      widget.currentLanguage,
+                    ),
+                  ),
                 ),
               ],
             );
@@ -181,14 +194,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
         content: Text(
-          widget.currentLanguage == 'ja'
-              ? '現在入力されているものをリセットしますか？' // Custom JP message
-              : 'Are you sure you want to reset current settings?',
+          LanguageUtils.getSettingsText(
+            'resetConfirmMessage',
+            widget.currentLanguage,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              LanguageUtils.getSettingsText('cancel', widget.currentLanguage),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -199,7 +215,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               }
               _saveSettings();
             },
-            child: const Text('Reset', style: TextStyle(color: Colors.red)),
+            child: Text(
+              LanguageUtils.getSettingsText('reset', widget.currentLanguage),
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -245,7 +264,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Share Settings'),
+        title: Text(
+          LanguageUtils.getSettingsText(
+            'shareSettings',
+            widget.currentLanguage,
+          ),
+        ),
         content: SizedBox(
           width: 250,
           height: 250,
@@ -258,7 +282,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(
+              LanguageUtils.getSettingsText('close', widget.currentLanguage),
+            ),
           ),
         ],
       ),
@@ -268,7 +294,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _scanQRCode() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const QRScannerScreen()),
+      MaterialPageRoute(
+        builder: (context) =>
+            QRScannerScreen(currentLanguage: widget.currentLanguage),
+      ),
     );
 
     if (result != null && result is String) {
@@ -289,7 +318,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           await _saveSettings();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Settings imported successfully!')),
+              SnackBar(
+                content: Text(
+                  LanguageUtils.getSettingsText(
+                    'settingsImported',
+                    widget.currentLanguage,
+                  ),
+                ),
+              ),
             );
           }
         }
@@ -406,18 +442,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'share',
                 child: ListTile(
-                  leading: Icon(Icons.share),
-                  title: Text('Share via QR'),
+                  leading: const Icon(Icons.share),
+                  title: Text(
+                    LanguageUtils.getSettingsText(
+                      'shareViaQR',
+                      widget.currentLanguage,
+                    ),
+                  ),
                 ),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'scan',
                 child: ListTile(
-                  leading: Icon(Icons.qr_code_scanner),
-                  title: Text('Scan QR'),
+                  leading: const Icon(Icons.qr_code_scanner),
+                  title: Text(
+                    LanguageUtils.getSettingsText(
+                      'scanQR',
+                      widget.currentLanguage,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -436,7 +482,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: OutlinedButton.icon(
                   onPressed: _openPresetManager,
                   icon: const Icon(Icons.list),
-                  label: const Text('Manage Presets'),
+                  label: Text(
+                    LanguageUtils.getSettingsText(
+                      'managePresets',
+                      widget.currentLanguage,
+                    ),
+                  ),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -610,7 +661,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 12),
               TextButton(
                 onPressed: _showPurchaseDialog,
-                child: const Text('Upgrade Plan / Restore'),
+                child: Text(
+                  LanguageUtils.getSettingsText(
+                    'upgradePlan',
+                    widget.currentLanguage,
+                  ),
+                ),
               ),
             ],
           ),
