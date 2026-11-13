@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/language_utils.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'qr_scanner_screen.dart';
 import '../utils/purchase_manager.dart';
@@ -26,17 +27,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final List<TextEditingController> multiChoiceControllers = [];
   int cardCount = 4; // カードの数を管理
   bool isSaved = false; // 保存状態を管理
+  StreamSubscription<void>? _purchaseSubscription;
 
   @override
   void initState() {
     super.initState();
     _ensureControllers(4);
     _loadSettings();
-    PurchaseManager().loadPurchases();
     // Re-check IAP status when entering settings
-    PurchaseManager().purchaseUpdates.listen((_) {
+    _purchaseSubscription = PurchaseManager().purchaseUpdates.listen((_) {
       if (mounted) setState(() {});
     });
+    PurchaseManager().queryProducts();
   }
 
   void _showPurchaseDialog() {
@@ -65,11 +67,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         widget.currentLanguage,
                       ),
                     ),
-                    subtitle: const Text('¥100'),
-                    onTap: () {
-                      pm.buyProduct(PurchaseManager.productTier1);
-                      Navigator.pop(context);
-                    },
+                    subtitle: Text(
+                      pm.priceOf(PurchaseManager.productTier1) ?? '',
+                    ),
+                    onTap: () => _startPurchase(PurchaseManager.productTier1),
                   ),
                   if (!isTier2Purchased)
                     ListTile(
@@ -79,11 +80,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           widget.currentLanguage,
                         ),
                       ),
-                      subtitle: const Text('¥200'),
-                      onTap: () {
-                        pm.buyProduct(PurchaseManager.productTier2);
-                        Navigator.pop(context);
-                      },
+                      subtitle: Text(
+                        pm.priceOf(PurchaseManager.productTier2) ?? '',
+                      ),
+                      onTap: () =>
+                          _startPurchase(PurchaseManager.productTier2),
                     ),
                 ],
               ),
@@ -112,8 +113,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _startPurchase(String productId) async {
+    Navigator.pop(context);
+    final started = await PurchaseManager().buyProduct(productId);
+    if (!started && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            LanguageUtils.getSettingsText(
+              'storeUnavailable',
+              widget.currentLanguage,
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   void dispose() {
+    _purchaseSubscription?.cancel();
     for (var controller in titleControllers) {
       controller.dispose();
     }

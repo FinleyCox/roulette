@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'dart:async';
 import 'package:in_app_review/in_app_review.dart';
 import 'dart:math';
 import '../widgets/scratch_card.dart';
 import '../widgets/banner_ad_widget.dart';
 import '../models/scratch_state.dart';
-import '../utils/ad_manager.dart';
 import 'settings_screen.dart';
 import 'privacy_policy_screen.dart';
 import '../utils/language_utils.dart';
@@ -32,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late ScratchState scratchState;
   late List<ScratchState> scratchStates;
   List<Key> cardKeys = [];
-  AppOpenAd? _appOpenAd;
+  StreamSubscription<void>? _purchaseSubscription;
 
   List<Map<String, String>> cardConfigs = [];
 
@@ -73,7 +72,10 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
     _loadSettings();
-    _loadAppOpenAd();
+    // 購入状態が変わったらバナー表示を更新する
+    _purchaseSubscription = PurchaseManager().purchaseUpdates.listen((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   // ランダム選択を更新するメソッド（全体）
@@ -213,51 +215,10 @@ class _HomeScreenState extends State<HomeScreen> {
     await _updateRandomChoices();
   }
 
-  // App Open Adを読み込む
-  void _loadAppOpenAd() {
-    if (PurchaseManager().isFullAdFree()) return;
-
-    AppOpenAd.load(
-      adUnitId: AdManager.appOpenAdUnitId,
-      orientation: AppOpenAd.orientationPortrait,
-      request: const AdRequest(),
-      adLoadCallback: AppOpenAdLoadCallback(
-        onAdLoaded: (ad) {
-          setState(() {
-            _appOpenAd = ad;
-          });
-          _showAppOpenAd();
-        },
-        onAdFailedToLoad: (error) {
-          // 広告読み込み失敗時は何もしない
-        },
-      ),
-    );
-  }
-
-  // App Open Adを表示する
-  void _showAppOpenAd() {
-    if (_appOpenAd == null) return;
-
-    _appOpenAd!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (ad) {
-        // 広告表示成功
-      },
-      onAdFailedToShowFullScreenContent: (ad, error) {
-        ad.dispose();
-      },
-      onAdDismissedFullScreenContent: (ad) {
-        ad.dispose();
-        _appOpenAd = null;
-      },
-    );
-
-    _appOpenAd!.show();
-  }
-
   @override
   void dispose() {
-    _appOpenAd?.dispose();
+    _purchaseSubscription?.cancel();
+    _refreshController.dispose();
     super.dispose();
   }
 

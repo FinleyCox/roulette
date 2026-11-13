@@ -5,7 +5,6 @@
 import FlutterMacOS
 import Foundation
 
-import country_codes
 import in_app_purchase_storekit
 import in_app_review
 import mobile_scanner
@@ -16,7 +15,6 @@ import url_launcher_macos
 import webview_flutter_wkwebview
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
-  CountryCodesPlugin.register(with: registry.registrar(forPlugin: "CountryCodesPlugin"))
   InAppPurchasePlugin.register(with: registry.registrar(forPlugin: "InAppPurchasePlugin"))
   InAppReviewPlugin.register(with: registry.registrar(forPlugin: "InAppReviewPlugin"))
   MobileScannerPlugin.register(with: registry.registrar(forPlugin: "MobileScannerPlugin"))

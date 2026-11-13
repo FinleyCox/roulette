@@ -82,11 +82,13 @@ class LanguageUtils {
         case 'upgradePlan':
           return 'Upgrade Plan';
         case 'tier1Title':
-          return 'Preset +3 Sets + Banner Ads Removed';
+          return 'Preset +3 Sets + Banner Ads Removed (can be bought again; 2nd purchase removes all ads)';
         case 'tier2Title':
-          return 'Preset +10 Sets + All Ads Removed';
+          return 'Preset +10 Sets + All Ads Removed (one-time purchase)';
         case 'close':
           return 'Close';
+        case 'storeUnavailable':
+          return 'Could not connect to Google Play. Please try again later.';
         case 'cancel':
           return 'Cancel';
         case 'reset':
@@ -151,11 +153,13 @@ class LanguageUtils {
         case 'upgradePlan':
           return 'योजना अपग्रेड करें';
         case 'tier1Title':
-          return 'Preset +3 सेट + बैनर विज्ञापन हटा दिए गए';
+          return 'Preset +3 सेट + बैनर विज्ञापन हटाएं (दोबारा खरीदा जा सकता है; दूसरी खरीद पर सभी विज्ञापन हट जाते हैं)';
         case 'tier2Title':
-          return 'Preset +10 सेट + सभी विज्ञापन हटा दिए गए';
+          return 'Preset +10 सेट + सभी विज्ञापन हटाएं (एक बार की खरीद)';
         case 'close':
           return 'बंद करें';
+        case 'storeUnavailable':
+          return 'Google Play से कनेक्ट नहीं हो सका। कृपया बाद में पुनः प्रयास करें।';
         case 'cancel':
           return 'रद्द करें';
         case 'reset':
@@ -220,11 +224,13 @@ class LanguageUtils {
         case 'upgradePlan':
           return 'プランのアップグレード';
         case 'tier1Title':
-          return 'プリセット上限3セット + バナー広告非表示';
+          return 'プリセット枠+3 + バナー広告非表示（複数回購入可・2回目の購入で全広告非表示）';
         case 'tier2Title':
-          return 'プリセット上限10セット + 広告非表示';
+          return 'プリセット枠+10 + 全広告非表示（買い切り）';
         case 'close':
           return '閉じる';
+        case 'storeUnavailable':
+          return 'Google Play に接続できませんでした。時間をおいて再度お試しください。';
         case 'cancel':
           return 'キャンセル';
         case 'reset':
@@ -263,104 +269,6 @@ class LanguageUtils {
           return '保存されたプリセットはありません';
         case 'resetConfirmMessage':
           return '現在入力されているものをリセットしますか？';
-        default:
-          return key;
-      }
-    }
-  }
-
-  // プライバシーポリシー画面のテキストを取得
-  static String getPrivacyPolicyText(String key, String languageCode) {
-    if (languageCode == 'en') {
-      switch (key) {
-        case 'privacyPolicy':
-          return 'Privacy Policy';
-        case 'privacyPolicyTitle':
-          return 'Privacy Policy (simple scratch)';
-        case 'privacyPolicyDescription':
-          return 'simple scratch (hereinafter "this app") respects user privacy.\nThis app does not collect, store, or transmit any personal information.';
-        case 'informationCollected':
-          return '1. Information Collected';
-        case 'informationCollectedDescription':
-          return 'This app does not collect the following information:\n\n• Personal identification information such as name and email address\n• Location information such as GPS\n• Usage status of other apps';
-        case 'dataTransmission':
-          return '2. Data Transmission and Storage';
-        case 'dataTransmissionDescription':
-          return 'This app does not transmit data over the internet or store information on external servers.\nAll user data is stored on the device.';
-        case 'advertising':
-          return '3. Advertising';
-        case 'advertisingDescription':
-          return 'This app does not display advertisements.';
-        case 'contact':
-          return '4. Contact';
-        case 'contactDescription':
-          return 'For questions regarding this privacy policy, please contact us at the email address below.';
-        case 'revision':
-          return '5. Revision';
-        case 'revisionDescription':
-          return 'This policy may be revised without notice. Updated policies will be published on this app or the distribution page.';
-        default:
-          return key;
-      }
-    } else if (languageCode == 'hi') {
-      switch (key) {
-        case 'privacyPolicy':
-          return 'गोपनीयता नीति';
-        case 'privacyPolicyTitle':
-          return 'गोपनीयता नीति (simple scratch)';
-        case 'privacyPolicyDescription':
-          return 'simple scratch (इसके बाद "यह ऐप") उपयोगकर्ता की गोपनीयता का सम्मान करता है।\nयह ऐप कोई भी व्यक्तिगत जानकारी एकत्र, संग्रहीत या प्रसारित नहीं करता है।';
-        case 'informationCollected':
-          return '1. एकत्र की गई जानकारी';
-        case 'informationCollectedDescription':
-          return 'यह ऐप निम्नलिखित जानकारी एकत्र नहीं करता है:\n\n• नाम और ईमेल पते जैसी व्यक्तिगत पहचान जानकारी\n• जीपीएस जैसी स्थान जानकारी\n• अन्य ऐप्स की उपयोग स्थिति';
-        case 'dataTransmission':
-          return '2. डेटा प्रसारण और भंडारण';
-        case 'dataTransmissionDescription':
-          return 'यह ऐप इंटरनेट पर डेटा प्रसारित नहीं करता है या बाहरी सर्वर पर जानकारी संग्रहीत नहीं करता है।\nसभी उपयोगकर्ता डेटा डिवाइस पर संग्रहीत किया जाता है।';
-        case 'advertising':
-          return '3. विज्ञापन';
-        case 'advertisingDescription':
-          return 'यह ऐप विज्ञापन प्रदर्शित नहीं करता है।';
-        case 'contact':
-          return '4. संपर्क';
-        case 'contactDescription':
-          return 'इस गोपनीयता नीति के बारे में प्रश्नों के लिए, कृपया नीचे दिए गए ईमेल पते पर हमसे संपर्क करें।';
-        case 'revision':
-          return '5. संशोधन';
-        case 'revisionDescription':
-          return 'इस नीति को बिना किसी सूचना के संशोधित किया जा सकता है। अद्यतन नीतियां इस ऐप या वितरण पृष्ठ पर प्रकाशित की जाएंगी।';
-        default:
-          return key;
-      }
-    } else {
-      switch (key) {
-        case 'privacyPolicy':
-          return 'プライバシーポリシー';
-        case 'privacyPolicyTitle':
-          return 'プライバシーポリシー（simple scratch）';
-        case 'privacyPolicyDescription':
-          return 'simple scratch（以下「本アプリ」）は、ユーザーのプライバシーを尊重します。\n本アプリは、個人情報の収集・保存・送信を一切行いません。';
-        case 'informationCollected':
-          return '1. 収集する情報';
-        case 'informationCollectedDescription':
-          return '本アプリは、以下の情報を収集しません：\n\n• 氏名・メールアドレス等の個人識別情報\n• GPS等の位置情報\n• 他のアプリの使用状況';
-        case 'dataTransmission':
-          return '2. データの送信・保存';
-        case 'dataTransmissionDescription':
-          return '本アプリは、インターネットを通じたデータ送信や外部サーバーへの情報保存を行いません。\nユーザーデータはすべて端末内に保存されます。';
-        case 'advertising':
-          return '3. 広告について';
-        case 'advertisingDescription':
-          return '本アプリには広告が表示されます。';
-        case 'contact':
-          return '4. お問い合わせ';
-        case 'contactDescription':
-          return 'プライバシーポリシーに関するご質問は、下記のメールアドレスまでご連絡ください。';
-        case 'revision':
-          return '5. 改定';
-        case 'revisionDescription':
-          return '本ポリシーは予告なく改定されることがあります。変更後のポリシーは本アプリ上または配布ページにて公開されます。';
         default:
           return key;
       }

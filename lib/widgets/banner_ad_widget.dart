@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../utils/ad_manager.dart';
+import '../utils/consent_manager.dart';
 
 class BannerAdWidget extends StatefulWidget {
   const BannerAdWidget({super.key});
@@ -17,15 +18,25 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   int _retryCount = 0;
   static const int _maxRetryCount = 3;
 
+  final ValueNotifier<bool> _adsReady = ConsentManager.instance.adsReady;
+
   @override
   void initState() {
     super.initState();
+    _adsReady.addListener(_onAdsReadyChanged);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_hasRequestedAd) {
+    _requestAdIfReady();
+  }
+
+  void _onAdsReadyChanged() => _requestAdIfReady();
+
+  // 同意取得（UMP）と Mobile Ads SDK 初期化が終わるまで広告をリクエストしない
+  void _requestAdIfReady() {
+    if (!_hasRequestedAd && _adsReady.value && mounted) {
       _hasRequestedAd = true;
       _loadAd();
     }
@@ -37,9 +48,12 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
       _isLoading = true;
     });
 
-    final adSize = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-      MediaQuery.of(context).size.width.truncate(),
-    );
+    final mediaQuery = MediaQuery.of(context);
+    final adSize =
+        await AdSize.getLargeAnchoredAdaptiveBannerAdSizeWithOrientation(
+          mediaQuery.orientation,
+          mediaQuery.size.width.truncate(),
+        );
 
     if (!mounted) return;
 
@@ -86,6 +100,7 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
   @override
   void dispose() {
+    _adsReady.removeListener(_onAdsReadyChanged);
     _bannerAd?.dispose();
     super.dispose();
   }
