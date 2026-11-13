@@ -2,23 +2,14 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'utils/language_utils.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'utils/app_open_ad_manager.dart';
 import 'widgets/app_lifecycle_manager.dart';
 import 'utils/purchase_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // AdMobを初期化
-  await MobileAds.instance.initialize();
-
-  // App Open Adを読み込む
-  // App Open Adを読み込む (広告未削除の場合のみ)
-  if (!PurchaseManager().isFullAdFree()) {
-    AppOpenAdManager.loadAd();
-  }
-
+  // 購入状態（ローカル保存分＋ストアからの復元）を先に読み込む。
+  // 広告の初期化・表示は同意取得（UMP）後に AppLifecycleManager で行う。
   await PurchaseManager().init();
 
   runApp(const MyApp());

@@ -22,11 +22,25 @@ class PurchaseManager {
       StreamController.broadcast();
   Stream<void> get purchaseUpdates => _purchaseUpdateController.stream;
 
+  bool _initialized = false;
+  StreamSubscription<List<PurchaseDetails>>? _subscription;
+
+  /// ストアから取得した商品情報（価格表示用）
+  final Map<String, ProductDetails> _products = {};
+
+  bool get isStoreAvailable => _isAvailable;
+
   Future<void> init() async {
+    if (_initialized) return;
+    _initialized = true;
+
+    // ローカルに保存済みの消費型購入回数を先に読み込む（広告表示判定に使うため）
+    await loadPurchases();
+
     _isAvailable = await _iap.isAvailable();
     if (_isAvailable) {
       final Stream<List<PurchaseDetails>> purchaseUpdated = _iap.purchaseStream;
-      purchaseUpdated.listen(
+      _subscription = purchaseUpdated.listen(
         (purchaseDetailsList) {
           _listenToPurchaseUpdated(purchaseDetailsList);
         },
@@ -39,8 +53,31 @@ class PurchaseManager {
       );
 
       await restorePurchases();
+      // 価格表示用に商品情報を取得（失敗しても起動は継続）
+      unawaited(queryProducts());
     }
   }
+
+  /// 商品情報を取得してキャッシュする
+  Future<Map<String, ProductDetails>> queryProducts() async {
+    if (!_isAvailable) return _products;
+    try {
+      final response = await _iap.queryProductDetails({
+        productTier1,
+        productTier2,
+      });
+      for (final p in response.productDetails) {
+        _products[p.id] = p;
+      }
+      _purchaseUpdateController.add(null);
+    } catch (_) {
+      // ネットワークエラー等
+    }
+    return _products;
+  }
+
+  /// ストアのローカライズ済み価格（未取得なら null）
+  String? priceOf(String productId) => _products[productId]?.price;
 
   Future<void> _listenToPurchaseUpdated(
     List<PurchaseDetails> purchaseDetailsList,
@@ -79,16 +116,15 @@ class PurchaseManager {
     await _iap.restorePurchases();
   }
 
-  Future<void> buyProduct(String productId) async {
-    final ProductDetailsResponse response = await _iap.queryProductDetails({
-      productId,
-    });
-    if (response.notFoundIDs.isNotEmpty) {
-      // Product not found
-      return;
+  /// 購入フローを開始する。開始できなかった場合は false を返す。
+  Future<bool> buyProduct(String productId) async {
+    if (!_isAvailable) return false;
+    ProductDetails? productDetails = _products[productId];
+    if (productDetails == null) {
+      await queryProducts();
+      productDetails = _products[productId];
     }
-    final List<ProductDetails> products = response.productDetails;
-    final ProductDetails productDetails = products.first;
+    if (productDetails == null) return false;
 
     final PurchaseParam purchaseParam = PurchaseParam(
       productDetails: productDetails,
@@ -101,6 +137,11 @@ class PurchaseManager {
       // Tier 2 is Non-Consumable
       await _iap.buyNonConsumable(purchaseParam: purchaseParam);
     }
+    return true;
+  }
+
+  void dispose() {
+    _subscription?.cancel();
   }
 
   // Check limits with additive logic
