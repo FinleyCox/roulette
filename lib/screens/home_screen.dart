@@ -342,11 +342,21 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             // バナー広告
+            // スクラッチ操作中の誤タップを防ぐため、カード領域との間に
+            // 余白と区切り線を入れて明確に分離する（AdMob の配置ポリシー）
             if (!PurchaseManager().isBannerAdFree())
               Container(
                 width: double.infinity,
                 color: scaffoldColor,
-                child: const BannerAdWidget(),
+                padding: const EdgeInsets.only(top: 12, bottom: 4),
+                child: const Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Divider(height: 1, thickness: 1),
+                    SizedBox(height: 12),
+                    BannerAdWidget(),
+                  ],
+                ),
               ),
           ],
         ),
