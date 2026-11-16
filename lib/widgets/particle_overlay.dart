@@ -30,7 +30,18 @@ class Particle {
 class ScratchEffectOverlay extends StatefulWidget {
   final Stream<Offset>? touchStream;
 
-  const ScratchEffectOverlay({super.key, this.touchStream});
+  /// 位置を流すと、その地点から色付きの粒が弾ける（開封演出用）
+  final Stream<Offset>? burstStream;
+
+  /// 削りカスの色（未指定ならグレー）
+  final List<Color>? particleColors;
+
+  const ScratchEffectOverlay({
+    super.key,
+    this.touchStream,
+    this.burstStream,
+    this.particleColors,
+  });
 
   @override
   State<ScratchEffectOverlay> createState() => _ScratchEffectOverlayState();
@@ -56,6 +67,31 @@ class _ScratchEffectOverlayState extends State<ScratchEffectOverlay>
     widget.touchStream?.listen((position) {
       _emitParticles(position);
     });
+    widget.burstStream?.listen(_emitBurst);
+  }
+
+  static const List<Color> _burstColors = [
+    Color(0xFFFF7A30),
+    Color(0xFFEC4880),
+    Color(0xFF3460EB),
+    Color(0xFFFFC83D),
+    Color(0xFF2EC4B6),
+  ];
+
+  void _emitBurst(Offset center) {
+    for (int i = 0; i < 48; i++) {
+      particles.add(
+        Particle(
+          position: center,
+          color: _burstColors[_random.nextInt(_burstColors.length)],
+          size: _random.nextDouble() * 5 + 3,
+          speed: _random.nextDouble() * 9 + 4,
+          angle: _random.nextDouble() * 2 * pi,
+          life: 1.0,
+          decay: 0.025 + _random.nextDouble() * 0.03,
+        ),
+      );
+    }
   }
 
   void _emitParticles(Offset position) {
@@ -64,7 +100,11 @@ class _ScratchEffectOverlayState extends State<ScratchEffectOverlay>
       particles.add(
         Particle(
           position: position,
-          color: Colors.grey[400]!,
+          color: widget.particleColors == null
+              ? Colors.grey[400]!
+              : widget.particleColors![_random.nextInt(
+                  widget.particleColors!.length,
+                )],
           size: _random.nextDouble() * 4 + 2,
           speed: _random.nextDouble() * 2 + 1,
           angle: _random.nextDouble() * 2 * pi,
