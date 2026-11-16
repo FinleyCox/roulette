@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:scratcher/scratcher.dart';
 import '../utils/onboarding_content.dart';
+import '../widgets/particle_overlay.dart';
 
 /// 初回起動時のオンボーディング。
 /// 1. 実際に削れるデモ  2. 選択肢の登録  3. リセット・プリセット・共有  4. テンプレート選択
@@ -27,15 +31,47 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _page = 0;
   bool _demoScratched = false;
+  bool _demoStarted = false;
   String? _selectedTemplateId;
   bool _finishing = false;
+
+  // 削りカスと開封時のバースト演出
+  final StreamController<Offset> _touchStream =
+      StreamController<Offset>.broadcast();
+  final StreamController<Offset> _burstStream =
+      StreamController<Offset>.broadcast();
+  final GlobalKey _demoKey = GlobalKey();
+  final GlobalKey<ScratcherState> _scratcherKey = GlobalKey<ScratcherState>();
+
+  static const List<Color> _foilChips = [
+    Color(0xFFFFB27A),
+    Color(0xFFF07AA6),
+    Color(0xFF8AA3F5),
+    Color(0xFFFFFFFF),
+  ];
 
   String t(String key) => OnboardingContent.text(key, widget.currentLanguage);
 
   @override
   void dispose() {
     _controller.dispose();
+    _touchStream.close();
+    _burstStream.close();
     super.dispose();
+  }
+
+  void _onDemoRevealed() {
+    if (_demoScratched) return;
+    setState(() => _demoScratched = true);
+    HapticFeedback.mediumImpact();
+    // 報酬カードのように、一定以上削ったら残りのカバーを一気に消す
+    _scratcherKey.currentState?.reveal(
+      duration: const Duration(milliseconds: 400),
+    );
+    final box = _demoKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box != null) {
+      _burstStream.add(box.size.center(Offset.zero));
+    }
   }
 
   void _next() {
@@ -188,36 +224,108 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),
-              child: Scratcher(
-                key: ValueKey('demo-${widget.currentLanguage}'),
-                brushSize: 44,
-                threshold: 30,
-                color: const Color(0xFFDBD8D8),
-                onThreshold: () => setState(() => _demoScratched = true),
-                child: Container(
-                  height: 110,
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  color: const Color(0xFFF9F8F6),
-                  child: Text(
-                    t('p1Result'),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+              child: SizedBox(
+                key: _demoKey,
+                height: 130,
+                width: double.infinity,
+                child: Stack(
+                  children: [
+                    Listener(
+                      onPointerMove: (e) => _touchStream.add(e.localPosition),
+                      child: Scratcher(
+                        key: _scratcherKey,
+                        brushSize: 44,
+                        threshold: 30,
+                        color: const Color(0xFFEC4880),
+                        image: Image.asset(
+                          'assets/onboarding/scratch_foil.png',
+                          fit: BoxFit.cover,
+                        ),
+                        onScratchStart: () {
+                          if (!_demoStarted) {
+                            setState(() => _demoStarted = true);
+                          }
+                        },
+                        onThreshold: _onDemoRevealed,
+                        child: Container(
+                          alignment: Alignment.center,
+                          color: const Color(0xFFFFF8F2),
+                          child: AnimatedScale(
+                            scale: _demoScratched ? 1.0 : 0.85,
+                            duration: const Duration(milliseconds: 350),
+                            curve: Curves.easeOutBack,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  t('p1ResultLabel'),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.black45,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  t('p1Result'),
+                                  style: const TextStyle(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    // カバー上の「ここを削る」表示（削り始めたら消える）
+                    IgnorePointer(
+                      child: AnimatedOpacity(
+                        opacity: _demoStarted ? 0 : 1,
+                        duration: const Duration(milliseconds: 250),
+                        child: Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.touch_app,
+                                color: Colors.white,
+                                size: 26,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                t('p1Hint'),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black26,
+                                      blurRadius: 6,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: ScratchEffectOverlay(
+                        touchStream: _touchStream.stream,
+                        burstStream: _burstStream.stream,
+                        particleColors: _foilChips,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          Center(
-            child: Text(
-              _demoScratched ? '' : t('p1Hint'),
-              style: const TextStyle(color: Colors.black45),
-            ),
-          ),
+          const SizedBox(height: 4),
           AnimatedOpacity(
             opacity: _demoScratched ? 1 : 0,
             duration: const Duration(milliseconds: 300),
