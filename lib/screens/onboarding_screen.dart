@@ -83,6 +83,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Expanded(
               child: PageView(
                 controller: _controller,
+                // 1ページ目のスクラッチ操作がページ送りに奪われないよう、
+                // スワイプでのページ移動は無効にしてボタンで進める
+                physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (i) => setState(() => _page = i),
                 children: [
                   _buildDemoPage(),
