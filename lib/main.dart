@@ -3,6 +3,8 @@ import 'screens/home_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'utils/language_utils.dart';
 import 'widgets/app_lifecycle_manager.dart';
+import 'screens/onboarding_screen.dart';
+import 'utils/onboarding_content.dart';
 import 'utils/purchase_manager.dart';
 
 void main() async {
@@ -11,12 +13,16 @@ void main() async {
   // 購入状態（ローカル保存分＋ストアからの復元）を先に読み込む。
   // 広告の初期化・表示は同意取得（UMP）後に AppLifecycleManager で行う。
   await PurchaseManager().init();
+  final needsOnboarding = await OnboardingContent.isNeeded();
 
-  runApp(const MyApp());
+  runApp(MyApp(showOnboarding: needsOnboarding));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, this.showOnboarding = false});
+
+  /// 初回起動時はオンボーディングを先に表示し、広告・同意フォームはその後に出す
+  final bool showOnboarding;
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -24,6 +30,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _currentLanguage = 'ja';
+  late bool _showOnboarding = widget.showOnboarding;
 
   @override
   void initState() {
@@ -86,13 +93,21 @@ class _MyAppState extends State<MyApp> {
       ],
 
       locale: Locale(_currentLanguage),
-      home: AppLifecycleManager(
-        child: HomeScreen(
-          title: 'simple scratch',
-          onLanguageChanged: _changeLanguage,
-          currentLanguage: _currentLanguage,
-        ),
-      ),
+      home: _showOnboarding
+          ? OnboardingScreen(
+              currentLanguage: _currentLanguage,
+              onLanguageChanged: _changeLanguage,
+              onFinished: () => setState(() => _showOnboarding = false),
+            )
+          : AppLifecycleManager(
+              // オンボーディング直後のセッションでは起動時の App Open 広告を出さない
+              showAppOpenAdOnStart: !widget.showOnboarding,
+              child: HomeScreen(
+                title: 'simple scratch',
+                onLanguageChanged: _changeLanguage,
+                currentLanguage: _currentLanguage,
+              ),
+            ),
     );
   }
 }

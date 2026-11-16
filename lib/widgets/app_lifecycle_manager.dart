@@ -6,7 +6,14 @@ import '../utils/purchase_manager.dart';
 class AppLifecycleManager extends StatefulWidget {
   final Widget child;
 
-  const AppLifecycleManager({super.key, required this.child});
+  /// 起動直後に App Open 広告を表示するか（初回起動のオンボーディング直後は false）
+  final bool showAppOpenAdOnStart;
+
+  const AppLifecycleManager({
+    super.key,
+    required this.child,
+    this.showAppOpenAdOnStart = true,
+  });
 
   @override
   State<AppLifecycleManager> createState() => _AppLifecycleManagerState();
@@ -33,7 +40,7 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
     await ConsentManager.instance.gatherConsent();
     if (!mounted) return;
     if (!PurchaseManager().isFullAdFree()) {
-      AppOpenAdManager.loadAd(showWhenLoaded: true);
+      AppOpenAdManager.loadAd(showWhenLoaded: widget.showAppOpenAdOnStart);
     }
   }
 
