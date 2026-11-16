@@ -15,6 +15,11 @@ class AppLifecycleManager extends StatefulWidget {
 class _AppLifecycleManagerState extends State<AppLifecycleManager>
     with WidgetsBindingObserver {
   bool _isAppInForeground = true;
+  DateTime? _pausedAt;
+
+  /// 共有シート・購入画面・カメラ許可などアプリ内操作から戻った直後に
+  /// App Open 広告を出さない（誤タップ防止）。一定時間以上離れていた場合のみ表示。
+  static const Duration _minBackgroundDuration = Duration(seconds: 30);
 
   @override
   void initState() {
@@ -46,11 +51,17 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
       case AppLifecycleState.resumed:
         if (!_isAppInForeground) {
           _isAppInForeground = true;
-          // アプリがフォアグラウンドに戻った時にApp Open Adを表示
-          _showAppOpenAd();
+          final pausedAt = _pausedAt;
+          _pausedAt = null;
+          // 一定時間以上バックグラウンドにいた場合のみ App Open 広告を表示
+          if (pausedAt != null &&
+              DateTime.now().difference(pausedAt) >= _minBackgroundDuration) {
+            _showAppOpenAd();
+          }
         }
         break;
       case AppLifecycleState.paused:
+        if (_isAppInForeground) _pausedAt = DateTime.now();
         _isAppInForeground = false;
         break;
       case AppLifecycleState.inactive:

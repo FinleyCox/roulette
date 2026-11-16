@@ -28,14 +28,25 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    // 保存済み設定の読み込みまでの間も端末の言語で表示する
+    _currentLanguage = _deviceDefaultLanguage();
     _loadLanguage();
   }
 
   Future<void> _loadLanguage() async {
-    final language = await LanguageUtils.getCurrentLanguage();
+    final language =
+        await LanguageUtils.getCurrentLanguage() ?? _deviceDefaultLanguage();
+    if (!mounted) return;
     setState(() {
-      _currentLanguage = language ?? 'ja';
+      _currentLanguage = language;
     });
+  }
+
+  /// 言語未設定時は端末の言語に合わせる（ja / hi 以外は英語）
+  String _deviceDefaultLanguage() {
+    final code =
+        WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    return const ['ja', 'hi'].contains(code) ? code : 'en';
   }
 
   void _changeLanguage(String languageCode) async {
