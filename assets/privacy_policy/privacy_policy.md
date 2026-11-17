@@ -1,6 +1,8 @@
-# simple scratch Privacy Policy / プライバシーポリシー / गोपनीयता नीति
+# FinelyCox Apps Privacy Policy / プライバシーポリシー / गोपनीयता नीति
 
-[日本語](#ja) | [English](#en) | [हिन्दी](#hi)
+**simple scratch** … [日本語](#ja) | [English](#en) | [हिन्दी](#hi)
+
+**Odd Man Rush** … [日本語](#omr-ja) | [English](#omr-en)
 
 ---
 
@@ -213,3 +215,131 @@ Email: inter0370@gmail.com
 ### 11. परिवर्तन
 
 कानूनों या ऐप में बदलाव के अनुसार इस नीति को अपडेट किया जा सकता है। महत्वपूर्ण बदलावों की सूचना ऐप में या Google Play पेज पर दी जाएगी।
+
+---
+
+<a id="omr-ja"></a>
+
+## Odd Man Rush プライバシーポリシー
+
+制定日・最終改定日：2026-11-17
+
+FinelyCox（以下「開発者」）は、スマートフォン向けアプリ「Odd Man Rush」（以下「本アプリ」）における利用者情報の取扱いについて、以下のとおり定めます。
+
+### 1. 開発者が収集する情報
+
+開発者は、氏名・メールアドレス・電話番号・位置情報などの個人情報を収集しません。また、開発者が運営するサーバーへデータを送信することもありません。本アプリにはアカウント登録・ログインの仕組みがありません。
+
+本アプリのカメラ挙動の設定、ハイスコア、所持している装備などのデータは、すべてお使いの端末内にのみ保存されます。
+
+### 2. 広告（Google AdMob）
+
+本アプリは、Google LLC が提供する広告配信サービス「Google AdMob」を利用しています。広告はリワード広告のみで、ゲームオーバー後にコンティニューを選んだ場合にのみ表示されます。広告を見ずに遊び続けることができます。
+
+AdMob は広告の配信・効果測定・不正防止のため、以下の情報を自動的に収集し、Google に送信することがあります。
+
+• 広告ID（Android 広告ID）などのデバイス識別子
+• IPアドレス（およびそこから推定されるおおよその位置情報）
+• 端末の機種・OS・言語などの端末情報
+• 広告の表示・視聴・途中終了などの操作履歴
+• クラッシュログ・パフォーマンス等の診断情報
+
+欧州経済領域（EEA）・英国・スイスなどの利用者には、Google の User Messaging Platform を通じて広告に関する同意を確認します。同意内容は、本アプリ内のプライバシーポリシー画面にある「AD PRIVACY SETTINGS（広告のプライバシー設定）」からいつでも変更できます。同意が得られない場合、本アプリは広告を要求しません。
+
+パーソナライズ広告は、端末の「設定 > Google > 広告」から広告IDの削除・リセットを行うことで無効にできます。
+
+Google によるデータの取扱いについては、次のページをご確認ください：https://policies.google.com/technologies/partner-sites
+
+### 3. アプリ内購入
+
+本アプリの購入は Google Play の決済システムを通じて行われます。クレジットカード番号などの支払い情報を開発者が取得することはありません。購入状態の確認に必要な購入情報（商品ID・購入トークン）は端末内で処理され、開発者のサーバーへ送信されることはありません。購入に関する情報の取扱いは Google のプライバシーポリシーに従います。
+
+### 4. 第三者への提供
+
+開発者は、上記2・3に記載した Google のサービスによる収集を除き、利用者の情報を第三者に提供・販売しません。
+
+### 5. データの保存期間と削除
+
+端末内に保存されたデータは、本アプリをアンインストールするか、端末の設定からアプリのデータを消去することで削除できます。Google が収集したデータの保存期間および削除については、Google のプライバシーポリシーに従います。
+
+### 6. 子どものプライバシー
+
+本アプリは13歳未満の子どもを主な対象としていません。13歳未満の子どもから意図的に個人情報を収集することはありません。
+
+### 7. セキュリティ
+
+広告配信に伴う通信は、Google のSDKにより暗号化（HTTPS）されて送信されます。
+
+### 8. お問い合わせ
+
+本ポリシーや利用者情報の取扱いに関するご質問は、下記のメールアドレスまでご連絡ください。
+
+Email: inter0370@gmail.com
+
+### 9. 改定
+
+本ポリシーは、法令の改正やサービス内容の変更に応じて改定することがあります。重要な変更がある場合は、本アプリまたは Google Play の配布ページでお知らせします。
+
+---
+
+<a id="omr-en"></a>
+
+## Odd Man Rush Privacy Policy
+
+Effective date: 2026-11-17
+
+This policy explains how FinelyCox ("the developer") handles user information in the mobile app "Odd Man Rush" ("the app").
+
+### 1. Information the developer collects
+
+The developer does not collect personal information such as your name, email address, phone number, or location, and the app does not send data to any server operated by the developer. The app has no accounts and no sign-in.
+
+Your camera-motion setting, your best run, and any equipment you own are stored only on your device.
+
+### 2. Advertising (Google AdMob)
+
+The app uses Google AdMob, an advertising service provided by Google LLC. The only adverts are rewarded videos, shown solely when you choose to continue after a run ends. You can keep playing without watching one.
+
+To serve and measure ads and to prevent fraud, AdMob may automatically collect the following information and send it to Google:
+
+• Device identifiers such as the Android Advertising ID
+• IP address (and approximate location derived from it)
+• Device information such as model, OS version, and language
+• Interactions with ads, such as impressions, completed views, and dismissals
+• Diagnostics such as crash logs and performance data
+
+Users in the European Economic Area (EEA), the UK, Switzerland, and other applicable regions are asked for consent through Google's User Messaging Platform. You can change your choice at any time from "AD PRIVACY SETTINGS" on the in-app Privacy screen. If consent is not given, the app does not request adverts.
+
+You can opt out of personalized ads by deleting or resetting your advertising ID in your device settings (Settings > Google > Ads).
+
+For how Google uses this data, see: https://policies.google.com/technologies/partner-sites
+
+### 3. In-app purchases
+
+Purchases are made through Google Play's billing system. The developer never receives your payment details such as credit card numbers. Purchase information needed to verify your purchase (product ID and purchase token) is processed on your device and is not sent to the developer. Google's Privacy Policy applies to purchase information.
+
+### 4. Disclosure to third parties
+
+Except for the collection by Google services described in sections 2 and 3, the developer does not share or sell user information to third parties.
+
+### 5. Retention and deletion
+
+Data stored on your device can be deleted by uninstalling the app or clearing its data in your device settings. Retention and deletion of data collected by Google are governed by Google's Privacy Policy.
+
+### 6. Children's privacy
+
+The app is not primarily directed to children under 13, and the developer does not knowingly collect personal information from children under 13.
+
+### 7. Security
+
+Network communication for advertising is encrypted in transit (HTTPS) by Google's SDK.
+
+### 8. Contact
+
+If you have any questions about this policy or how your information is handled, please contact us at the email address below.
+
+Email: inter0370@gmail.com
+
+### 9. Changes
+
+This policy may be updated to reflect changes in laws or in the app. Significant changes will be announced in the app or on the Google Play listing.
