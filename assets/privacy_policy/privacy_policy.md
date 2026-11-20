@@ -4,6 +4,8 @@
 
 **Odd Man Rush** … [日本語](#omr-ja) | [English](#omr-en)
 
+**Wildlife Focus** … [日本語](#wf-ja) | [English](#wf-en)
+
 ---
 
 <a id="ja"></a>
@@ -341,5 +343,101 @@ If you have any questions about this policy or how your information is handled, 
 Email: inter0370@gmail.com
 
 ### 9. Changes
+
+This policy may be updated to reflect changes in laws or in the app. Significant changes will be announced in the app or on the Google Play listing.
+
+---
+
+<a id="wf-ja"></a>
+
+## Wildlife Focus プライバシーポリシー
+
+制定日・最終改定日：2026-11-20
+
+FinelyCox（以下「開発者」）は、スマートフォン向けアプリ「Wildlife Focus」（以下「本アプリ」）における利用者情報の取扱いについて、以下のとおり定めます。
+
+### 1. 開発者が収集する情報
+
+開発者は、氏名・メールアドレス・電話番号・位置情報などの個人情報を収集しません。本アプリにはアカウント登録もログインもありません。
+
+集中した回数・時間・進んだ距離などの記録、解放した動物、各種設定は、**利用者の端末の中だけ**に保存されます。開発者が運営するサーバーへ送信されることはありません。
+
+### 2. 通信について
+
+本アプリに表示される動物の移動経路は、あらかじめアプリに同梱されています。そのため、**本アプリ自体はインターネット通信を行いません**。
+
+例外は購入処理です。アプリ内購入を行うときに限り、Google Play の課金の仕組みが Google と通信します。この処理は Google が行うもので、開発者がクレジットカード番号などの決済情報を受け取ることはありません。
+
+### 3. 広告
+
+**本アプリに広告は表示されません。** 広告 SDK も組み込まれていません。
+
+### 4. 通知
+
+集中や休憩の終わりをお知らせするために、端末のローカル通知を使います。通知の内容が外部へ送信されることはありません。通知は端末の設定からいつでも停止できます。
+
+### 5. データの保存期間と削除
+
+端末に保存されたデータは、本アプリをアンインストールするか、端末の設定からアプリのデータを削除することで消去できます。購入の記録は Google アカウントに紐づいており、再インストール時にアプリ内の「購入を復元」から戻せます。
+
+### 6. 子どものプライバシー
+
+本アプリは 13 歳未満の子どもを主な対象としていません。開発者が 13 歳未満の子どもから個人情報を故意に収集することはありません。
+
+### 7. お問い合わせ
+
+本ポリシーや情報の取扱いについてご質問がある場合は、下記までご連絡ください。
+
+メール: inter0370@gmail.com
+
+### 8. 変更
+
+本ポリシーは、法令や本アプリの変更に合わせて更新することがあります。重要な変更はアプリ内または Google Play の掲載情報でお知らせします。
+
+---
+
+<a id="wf-en"></a>
+
+## Wildlife Focus Privacy Policy
+
+Effective date: 2026-11-20
+
+This policy explains how FinelyCox ("the developer") handles user information in the mobile app "Wildlife Focus" ("the app").
+
+### 1. Information the developer collects
+
+The developer does not collect personal information such as your name, email address, phone number, or location. The app has no accounts and no sign-in.
+
+Your focus records (sessions, time, distance traced), the species you have unlocked, and your settings are stored **only on your device**. They are never sent to any server operated by the developer.
+
+### 2. Network use
+
+The animal routes shown in the app are bundled with the app itself. For that reason, **the app does not make any network connections of its own**.
+
+The one exception is purchasing. When you make an in-app purchase, Google Play's billing system communicates with Google. That process is handled by Google, and the developer never receives your payment details.
+
+### 3. Advertising
+
+**The app shows no ads.** No advertising SDK is included.
+
+### 4. Notifications
+
+The app uses local notifications on your device to tell you when a focus or break period ends. Nothing about those notifications is sent anywhere. You can turn them off at any time in your device settings.
+
+### 5. Retention and deletion
+
+Data stored on your device can be deleted by uninstalling the app or clearing its data in your device settings. Purchases are tied to your Google account and can be brought back with "Restore purchases" in the app after reinstalling.
+
+### 6. Children's privacy
+
+The app is not primarily directed to children under 13, and the developer does not knowingly collect personal information from children under 13.
+
+### 7. Contact
+
+If you have any questions about this policy or how your information is handled, please contact us at the email address below.
+
+Email: inter0370@gmail.com
+
+### 8. Changes
 
 This policy may be updated to reflect changes in laws or in the app. Significant changes will be announced in the app or on the Google Play listing.
